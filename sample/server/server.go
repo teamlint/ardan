@@ -18,7 +18,7 @@ import (
 
 func Start() {
 	server.SetMode(server.DebugMode)
-	container.MustProvide(repository.NewMySQL)
+	container.MustProvide(repository.NewDB)
 	container.MustProvide(repository.NewUserRepository)
 	container.MustProvide(service.NewUserService)
 	container.MustProvide(server.Default)

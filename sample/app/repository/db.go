@@ -10,8 +10,8 @@ import (
 	"xorm.io/xorm"
 )
 
-func NewMySQL() (*xorm.Engine, error) {
-	db, err := xorm.NewEngine("mysql", config.Databases("UserDB").ConnString)
+func NewDB() (*xorm.Engine, error) {
+	db, err := xorm.NewEngine(config.Databases("UserDB").DriverName, config.Databases("UserDB").ConnString)
 	if err != nil {
 		return nil, err
 	}

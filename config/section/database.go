@@ -5,6 +5,7 @@ type Databases map[string]*Database
 
 // Database 数据库配置
 type Database struct {
+	DriverName      string // 数据库驱动名称
 	ConnString      string // 数据库连接字符串
 	ConnMaxLifetime string // 连接生命周期(分钟)
 	MaxOpenConns    int    // 最大连接数

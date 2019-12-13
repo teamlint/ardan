@@ -13,6 +13,7 @@ App:
 
 Databases:
   UserDB:
+    DriverName: "mysql"
     ConnString: "root:123456@/test?charset=utf8mb4&parseTime=True"
 #     ConnMaxLifetime: "3m" # 3 minutes
 #     MaxOpenConns: 1000
