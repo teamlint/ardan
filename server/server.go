@@ -41,20 +41,21 @@ func Mode() string {
 }
 
 // New 初始化服务器
-func New(rp RouteParams, cs ...Configurator) *Server {
+// func New(rp RouteParams, cs ...Configurator) *Server {
+func New() *Server {
 	e := gin.New()
 	s := &Server{e}
-	s.registerRouteParams(rp)
-	s.Configure(cs...)
+	// s.registerRouteParams(rp)
+	// s.Configure(cs...)
 	return s
 }
 
 // Default 默认服务器
-func Default(rp RouteParams, cs ...Configurator) *Server {
+func Default() *Server {
 	e := gin.Default()
 	s := &Server{e}
-	s.registerRouteParams(rp)
-	s.Configure(cs...)
+	// s.registerRouteParams(rp)
+	// s.Configure(cs...)
 	return s
 }
 
