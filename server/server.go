@@ -27,6 +27,11 @@ type RouteParams struct {
 	Routes []route.RouteInfo `group:"route"`
 }
 
+// Module 服务器模块
+type Module interface {
+	RegisterModule(s *Server)
+}
+
 // Configurator 服务器配置
 type Configurator func(*Server)
 
@@ -56,6 +61,16 @@ func Default() *Server {
 	s := &Server{e}
 	// s.registerRouteParams(rp)
 	// s.Configure(cs...)
+	return s
+}
+
+// NewWithModules 使用模块初始化服务器
+func NewWithModules(ms []Module) *Server {
+	e := gin.Default()
+	s := &Server{e}
+	for _, m := range ms {
+		m.RegisterModule(s)
+	}
 	return s
 }
 
