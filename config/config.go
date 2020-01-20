@@ -61,7 +61,6 @@ func Config(opts ...Option) *section.Config {
 	if err != nil {
 		log.Fatalf("config file read err: %v\n", err)
 	}
-	log.Printf("config: %+v\n", conf)
 	for _, opt := range opts {
 		opt(conf)
 	}
