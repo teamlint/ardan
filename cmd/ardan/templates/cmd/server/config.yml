@@ -1,0 +1,24 @@
+App:
+  Title: "Ardan 示例"
+  # Copyright: "版权信息"
+  Debug: true
+  # TimeFormat: "2006-01-02 15:04:05"
+  # Charset: "UTF-8"
+  # Settings:
+  #    hello: "world"
+
+
+# Server:
+    # HttpAddr: ":1234"
+
+Databases:
+  UserDB:
+    DriverName: "mysql"
+    ConnString: "root:123456@/test?charset=utf8mb4&parseTime=True"
+#     ConnMaxLifetime: "3m" # 3 minutes
+#     MaxOpenConns: 1000
+#     MaxIdleConns: 10
+#     Log: true
+
+# Test:
+#   Abc: "abc342"
