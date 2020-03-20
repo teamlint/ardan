@@ -1,33 +1,43 @@
-package repository
+package {{.Setting.RepositoryDir}}
 
 import (
 	"log"
 	"time"
-
-	_ "github.com/go-sql-driver/mysql"
+    {{$drv:=.Setting.DBDriver}}
+	{{if eq $drv "postgres"}}
+	_ "github.com/lib/pq"
+	{{else if eq $drv "mysql"}}
+	_ "github.com/lib/pq"
+	{{else}}
+	_ "github.com/mattn/go-sqlite3"
+	{{end}}
 	"github.com/teamlint/ardan/config"
-	"github.com/teamlint/ardan/server"
 	"xorm.io/xorm"
 )
-
+{{$db:=.Setting.DBName}}
 func NewDB() (*xorm.Engine, error) {
-	db, err := xorm.NewEngine(config.Databases("UserDB").DriverName, config.Databases("UserDB").ConnString)
+	db, err := xorm.NewEngine(config.Databases("{{$db}}").DriverName, config.Databases("{{$db}}").ConnString)
 	if err != nil {
 		return nil, err
 	}
+	db.SetMapper(core.GonicMapper{})
 	// ping
 	err = db.Ping()
 	if err != nil {
-		log.Printf("[repository.NewDB] err=%v\n", err)
+		log.Fatalf("[repository.NewDB] err=%v\n", err)
 	}
 	// conn
-	db.SetMaxOpenConns(10000)
-	db.SetMaxIdleConns(100)
-	db.SetConnMaxLifetime(3 * time.Minute)
+	db.SetMaxOpenConns(config.Databases("{{$db}}").MaxOpenConns)
+	db.SetMaxIdleConns(config.Databases("{{$db}}").MaxIdleConns)
+	dur, err := time.ParseDuration(config.Databases("{{$db}}").ConnMaxLifetime)
+	if err != nil {
+		log.Fatalf("[repository.NewDB] SetConnMaxLifetime err=%v\n", err)
+	}
+	db.SetConnMaxLifetime(dur)
 	// log
-	if server.Mode() == server.DebugMode {
+	if config.App().Debug {
 		db.ShowSQL(true)
 	}
-	// db.SetLogLevel(core.LOG_DEBUG)
+
 	return db, err
 }

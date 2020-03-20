@@ -41,6 +41,23 @@ func Mkdir(fpath string) error {
 	return err
 }
 
+// NewFile
+func NewFile(filename string) (*os.File, error) {
+	dir := Dir(filename)
+	var err error
+	if !Exists(dir) {
+		err = Mkdir(dir)
+		if err != nil {
+			return nil, err
+		}
+	}
+	f, err := os.Create(filename)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
 // CreateFile
 func CreateFile(filename string, src ...io.Reader) error {
 	dir := Dir(filename)

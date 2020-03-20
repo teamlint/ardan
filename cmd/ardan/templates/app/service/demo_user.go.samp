@@ -1,0 +1,21 @@
+package {{.Setting.ServiceDir}}
+
+import (
+    "{{.Setting.GoModName}}/{{.Setting.OutputDir|clean}}/{{.Setting.AppDir}}/{{.Setting.ModelDir}}"
+    "{{.Setting.GoModName}}/{{.Setting.OutputDir|clean}}/{{.Setting.AppDir}}/{{.Setting.RepositoryDir}}"
+)
+
+type DemoUserService interface {
+    Get(id string) (*{{.Setting.ModelDir}}.DemoUser, error)
+}
+type demoUserService struct {
+    repo *{{.Setting.RepositoryDir}}.DemoUserRepository
+}
+
+func NewDemoUserService(repo *{{.Setting.RepositoryDir}}.UserRepository) DemoUserService {
+	return &demoUserService{repo}
+}
+
+func (s *demoUserService) Get(id string) (*{{.Setting.ModelDir}}.DemoUser, error) {
+	return s.repo.Get(id)
+}
