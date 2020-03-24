@@ -1,0 +1,44 @@
+package {{.Setting.Controller}}
+
+import (
+	"net/http"
+	"time"
+
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}/query"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Service}}"
+
+	"github.com/rs/zerolog/log"
+
+	"github.com/gin-gonic/gin"
+	api "github.com/teamlint/ardan/pkg/http"
+	"github.com/teamlint/ardan/server"
+)
+
+type HomeController struct{
+	// YourService     service.YourService
+
+}
+
+// func NewHomeController(svc {{.Setting.Service}}.YourService) *HomeController {
+func NewHomeController() *HomeController {
+	return &HomeController{
+		// YourService: svc,
+	}
+}
+
+// server module register interface
+func (c *HomeController) RegisterModule(s *server.Server) {
+	s.GET("/", c.Index)
+}
+
+func (c *HomeController) Index(ctx *gin.Context) {
+	var err error
+	result:=map[string]interface{} {
+		"Name":"ardan",
+		"Page":"Home>Index",
+		"Message":"Welcome to used ardan!",
+		"CreatedAt":time.Now(),
+	}
+	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", result))
+}

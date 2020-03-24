@@ -1,0 +1,24 @@
+package {{.Setting.Middleware}}
+
+import (
+	"log"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/teamlint/ardan/server"
+)
+
+type Demo struct{}
+
+func NewDemo() *Demo{
+	return &Demo{}
+}
+
+// server module register interface
+func (m *Demo) RegisterModule(s *server.Server) {
+	s.Use(m.Log)
+}
+func (m *Demo) Log(ctx *gin.Context) {
+	log.Printf("[Middleware] Demo.Log @ %v\n", time.Now().Unix())
+	ctx.Next()
+}

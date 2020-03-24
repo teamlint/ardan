@@ -1,0 +1,27 @@
+package query
+
+import (
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
+	"fmt"
+
+	"xorm.io/xorm"
+)
+
+// Demo demo model query
+type Demo struct {
+	Username   string `json:"username"`
+	IsApproved bool   `json:"is_approved"`
+}
+
+// Options 查询参数
+func (q *Demo) Options(sess *xorm.Session) *xorm.Session {
+	if q == nil {
+		return sess
+	}
+	if q.Username != "" {
+		sess.Where("username=?", q.Username)
+	}
+	sess.Where("is_approved=?", q.IsApproved})
+
+	return sess
+}

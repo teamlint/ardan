@@ -1,0 +1,44 @@
+package command
+
+import (
+	"log"
+	"strings"
+
+	"github.com/urfave/cli/v2"
+)
+
+// InitApp init application layer layout
+var InitApp = &cli.Command{
+	Name:    "app",
+	Aliases: []string{"a"},
+	Usage:   "initial application layer layout",
+	Action:  initAppCode,
+}
+
+func initAppCode(c *cli.Context) error {
+	// code
+	for _, name := range Setting.Codes {
+		log.Printf("[init.app] path=%v,appDir=%v\n", name, Setting.App)
+		if strings.HasPrefix(name, Setting.App) {
+			// tmpl
+			err := Render(Setting.TargetFile(name), name)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	// sample
+	if Setting.Sample {
+		for _, name := range Setting.Samples {
+			if strings.HasPrefix(name, Setting.App) {
+				// tmpl
+				err := Render(Setting.TargetFile(name), name)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
+}

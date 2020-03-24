@@ -1,0 +1,41 @@
+package {{.Setting.Model}}
+
+import (
+	"errors"
+
+	"github.com/rs/xid"
+)
+
+var (
+	ErrNotFound        = errors.New("not found")
+	ErrPKNotFound      = errors.New("pk not found")
+	ErrChannelIDIsNull = errors.New("channel id is null")
+)
+
+// NewID generate unique ID
+func NewID() string {
+	return xid.New().String()
+}
+type PagedResult struct {
+	Totals int64       `json:"totals"`
+	Items  interface{} `json:"items"`
+}
+type Data = map[string]interface{}
+
+// JSON 统一JSON处理
+type JSON string
+
+func (j *JSON) FromDB(b []byte) error {
+	if len(b) > 0 {
+		*j = JSON(string(b))
+		return nil
+	}
+	return nil
+}
+func (j *JSON) ToDB() ([]byte, error) {
+	str := string(*j)
+	if str == "" {
+		return []byte("{}"), nil
+	}
+	return []byte(str), nil
+}

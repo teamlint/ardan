@@ -1,0 +1,66 @@
+package {{.Setting.Server}}
+
+import (
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/teamlint/ardan/config"
+	"github.com/teamlint/container"
+
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Repository}}"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Service}}"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.Server}}/{{.Setting.ServerModule}}"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.Server}}/{{.Setting.Middleware}}"
+	"github.com/teamlint/ardan/server"
+)
+
+// Start use teamlint container
+func Start() {
+	container.Build(
+		// application
+		container.Provide({{.Setting.Repository}}.NewDB),
+		{{if .Setting.Sample}}
+		container.Provide({{.Setting.Repository}}.NewDemoUserRepository),
+		container.Provide({{.Setting.Service}}.NewDemoUserService),
+		{{end}}
+		// modules
+		container.Provide({{.Setting.ServerModule}}.NewCORS, container.As(new(server.Module))),
+		container.Provide({{.Setting.ServerModule}}.NewLogger, container.As(new(server.Module))),
+		{{if .Setting.Sample}}
+		container.Provide({{.Setting.ServerModule}}.NewSync, container.As(new(server.Module))),
+		{{end}}
+		// middlewares
+		{{if .Setting.Sample}}
+		container.Provide({{.Setting.Middleware}}.NewDemo, container.As(new(server.Module))),
+		{{end}}
+		// controllers
+		container.Provide({{.Setting.Controller}}.NewHomeController, container.As(new(server.Module))),
+		{{if .Setting.Sample}}
+		container.Provide({{.Setting.Controller}}.NewDemoController, container.As(new(server.Module))),
+		{{end}}
+
+		// with modules server
+		container.Provide(server.NewWithModules),
+	)
+	var srv *server.Server
+	container.MustExtract(&srv)
+
+	// http server
+	conf := config.Config()
+	s := srv.HttpServer(conf)
+
+	// greaceful shutdown
+	done := make(chan struct{}, 1)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+	go server.GracefulShutdown(s, quit, done, conf)
+	log.Println("Server is ready to handle requests at", conf.Server.HttpAddr)
+	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("Could not listen on %s: %v\n", conf.Server.HttpAddr, err)
+	}
+	<-done
+	log.Println("Server stopped")
+}

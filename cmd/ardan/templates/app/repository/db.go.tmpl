@@ -1,4 +1,4 @@
-package {{.Setting.RepositoryDir}}
+package {{.Setting.Repository}}
 
 import (
 	"log"
@@ -13,14 +13,22 @@ import (
 	{{end}}
 	"github.com/teamlint/ardan/config"
 	"xorm.io/xorm"
+	"xorm.io/xorm/names"
 )
+
+// SessionOptions session options
+type SessionOptions interface {
+	Options(sess *xorm.Session) *xorm.Session
+}
+
 {{$db:=.Setting.DBName}}
+// NewDB create database engine
 func NewDB() (*xorm.Engine, error) {
 	db, err := xorm.NewEngine(config.Databases("{{$db}}").DriverName, config.Databases("{{$db}}").ConnString)
 	if err != nil {
 		return nil, err
 	}
-	db.SetMapper(core.GonicMapper{})
+	db.SetMapper(names.GonicMapper{})
 	// ping
 	err = db.Ping()
 	if err != nil {

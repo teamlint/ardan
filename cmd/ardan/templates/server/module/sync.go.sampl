@@ -1,0 +1,38 @@
+package {{.Setting.ServerModule}}
+
+import (
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
+
+	"github.com/rs/zerolog/log"
+
+	"github.com/teamlint/ardan/config"
+	"github.com/teamlint/ardan/server"
+	"github.com/teamlint/container"
+	"xorm.io/xorm"
+)
+
+type Sync struct{}
+
+func NewSync() *Sync {
+	return &Sync{}
+}
+
+func (m *Sync) RegisterModule(srv *server.Server) {
+    // sync
+    if s := config.Get("App", "Settings", "SyncDB").Bool(false); s {
+        container.MustInvoke(func(db *xorm.Engine) {
+            sync(db)
+        })
+    }
+}
+
+func sync(db *xorm.Engine) {
+	err := db.Sync2(
+		new({{.Setting.Model}}.DemoUser),
+	)
+	if err != nil {
+		log.Err(err).Msg("db sync err")
+	} else {
+		log.Info().Msg("database sync done")
+	}
+}

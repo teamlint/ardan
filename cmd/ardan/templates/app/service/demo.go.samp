@@ -1,0 +1,51 @@
+package {{.Setting.Service}}
+
+import (
+    "{{.Setting.GoMod}}/{{.Setting.Output|clean}}/{{.Setting.App}}/{{.Setting.Model}}"
+    "{{.Setting.GoMod}}/{{.Setting.Output|clean}}/{{.Setting.App}}/{{.Setting.Model}}/query"
+    "{{.Setting.GoMod}}/{{.Setting.Output|clean}}/{{.Setting.App}}/{{.Setting.Repository}}"
+)
+
+type DemoService interface {
+	Save(item *{{.Setting.Model}}.Demo) error
+	Get(id string) (*{{.Setting.Model}}.Demo, error) 
+	GetByUsername(name string) (*{{.Setting.Model}}.Demo, error) 
+	List() ([]*{{.Setting.Model}}.Demo, error)
+	Paged(base *query.Base, q *query.Demo) ([]*{{.Setting.Model}}.Demo, int64, error)
+	Delete(id string) error 
+}
+type DemoService struct {
+    repo *{{.Setting.Repository}}.DemoRepository
+}
+
+func NewDemoService(repo *{{.Setting.Repository}}.DemoUserRepository) DemoService {
+	return &demoService{repo}
+}
+
+func (s *demoService) Save(item *{{.Setting}}.Demo) error {
+	if item.ID != "" {
+		return s.repo.Update(nil, item)
+	}
+	item.ID = {{.Setting.Model}}.NewID()
+	return s.repo.Insert(nil, item)
+}
+
+func (s *demoService) Get(id string) (*{{.Setting.Model}}.Demo, error) {
+	return s.repo.Get(nil, id, false)
+}
+
+func (s *demoService) GetByUsername(name string) (*{{.Setting.Model}}.Demo, error) {
+	return s.repo.GetBy(nil, "username = ?", name)
+}
+
+func (s *demoService) List() ([]*{{.Setting.Model}}.Demo, error) {
+	return s.repo.Find(nil, nil)
+}
+
+func (s *demoService) Paged(base *query.Base, q *query.Demo) ([]*{{.Setting.Model}}.Demo, int64, error) {
+	return s.repo.Paged(sess, base.DefaultOrderBy("id desc"), q)
+}
+
+func (s *demoService) Delete(id string) error {
+	return s.repo.Delete(nil, id, false)
+}

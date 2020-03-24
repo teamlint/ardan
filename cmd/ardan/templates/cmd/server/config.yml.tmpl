@@ -1,6 +1,6 @@
 App:
   Title: "Ardan 示例"
-  # Copyright: "版权信息"
+  Copyright: "teamlint.com"
   Debug: true
   # TimeFormat: "2006-01-02 15:04:05"
   # Charset: "UTF-8"
@@ -15,10 +15,12 @@ Databases:
   UserDB:
     DriverName: "mysql"
     ConnString: "root:123456@/test?charset=utf8mb4&parseTime=True"
-#     ConnMaxLifetime: "3m" # 3 minutes
-#     MaxOpenConns: 1000
-#     MaxIdleConns: 10
-#     Log: true
+    ConnMaxLifetime: "3m" # 3 minutes
+    MaxOpenConns: 300
+    MaxIdleConns: 10
+    Log: true
 
-# Test:
-#   Abc: "abc342"
+JWT:
+  Method: "HS256"
+  Secret: "{{randomString 8}}"
+  Exp: "168h"

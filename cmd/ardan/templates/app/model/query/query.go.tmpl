@@ -1,0 +1,37 @@
+package query
+
+import (
+	"xorm.io/xorm"
+)
+
+// Base 基本查询条件
+type Base struct {
+	PageNumber int    `form:"page_number" json:"page_number"`
+	PageSize   int    `form:"page_size" json:"page_size"`
+	OrderBy    string `form:"orderBy" json:"order_by"`
+}
+
+// Options
+func (b *Base) Options(sess *xorm.Session) *xorm.Session {
+	if b == nil {
+		return sess
+	}
+	if b.PageNumber > 0 && b.PageSize > 0 {
+		sess.Limit(b.PageSize, (b.PageNumber-1)*b.PageSize)
+	}
+
+	if b.OrderBy == "" {
+		sess.OrderBy("id desc")
+	} else {
+		sess.OrderBy(b.OrderBy)
+	}
+	return sess
+}
+
+// DefaultOrderBy 默认排序
+func (b *Base) DefaultOrderBy(ob string) *Base {
+	if b.OrderBy == "" {
+		b.OrderBy = ob
+	}
+	return b
+}

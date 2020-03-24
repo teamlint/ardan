@@ -1,0 +1,63 @@
+package {{.Setting.Controller}}
+
+import (
+	"net/http"
+
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}/query"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Service}}"
+
+	"github.com/rs/zerolog/log"
+
+	"github.com/gin-gonic/gin"
+	"github.com/teamlint/ardan/server"
+	api "github.com/teamlint/ardan/pkg/http"
+)
+
+type DemoController struct{
+	DemoService     service.DemoService
+
+}
+
+func NewUserController(svc {{.Setting.Service}}.DemoService) *DemoController {
+	return &DemoController{
+		DemoService: svc,
+	}
+}
+
+// server module register interface
+func (c *DemoController) RegisterModule(s *server.Server) {
+	g := s.Group("/demo")
+	g.GET("/list", c.List)
+	g.GET("/info/:id", c.Info)
+}
+
+func (c *DemoController) List(ctx *gin.Context) {
+	var err error
+	params := struct {
+		query.Base
+		query.Demo
+	}{}
+	if err = ctx.ShouldBindJSON(&data); err != nil {
+		log.Err(err).Msg("BindJSON")
+		ctx.JSON(http.StatusBadRequest, api.NewResponseError("参数解析失败"))
+		return
+	}
+	var totals int64
+	var items []*{{.Setting.Model}}.Demo
+	items, totals, err = c.DemoService.Paged(&params.Base, &params.Demo)
+	if err != nil {
+		log.Err(err).Msg("c.DemoService.Paged")
+		ctx.JSON(http.StatusOK, api.NewResponseError("获取资源列表信息失败"))
+		return
+	}
+	result := {{.Setting.Model}}.PagedResult{
+		Totals: totals,
+		Items:  items,
+	}
+	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", result))
+}
+func (c *DemoController) Info(ctx *gin.Context) {
+	id := ctx.Param("id")
+	ctx.String(http.StatusOK, "[DemoController] get user[%v] info", id)
+}

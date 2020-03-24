@@ -1,0 +1,32 @@
+package {{.Setting.ServerModule}}
+
+import (
+	"os"
+
+	"github.com/gin-contrib/logger"
+	"github.com/rs/zerolog"
+	zlog "github.com/rs/zerolog/log"
+	"github.com/teamlint/ardan/config"
+	"github.com/teamlint/ardan/server"
+)
+
+type Logger struct{}
+
+func NewLogger() *Logger {
+	return &Logger{}
+}
+
+func (m *Logger) RegisterModule(srv *server.Server) {
+    zerolog.SetGlobalLevel(zerolog.Disabled)
+    if config.App().Debug {
+        zerolog.SetGlobalLevel(zerolog.DebugLevel)
+        zlog.Logger = zlog.Output(
+            zerolog.ConsoleWriter{
+                Out:     os.Stderr,
+                NoColor: false,
+            },
+        )
+    }
+
+    srv.Use(logger.SetLogger())
+}

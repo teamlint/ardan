@@ -1,11 +1,11 @@
 //go:generate stringer -type Gender -linecomment -output demo_user_gender.go
-package model
+package {{.Setting.Model}}
 
 import (
 	"time"
 )
 
-type DemoUser struct {
+type Demo struct {
 	ID         string     `xorm:"not null pk unique CHAR(20) 'id'" json:"id"`
 	Username   string     `xorm:"not null index VARCHAR(100)" json:"username"`
 	Password   string     `xorm:"not null VARCHAR(100)" json:"password"`
@@ -21,8 +21,8 @@ type DemoUser struct {
 }
 
 // TableName return table name
-func (m DemoUser) TableName() string {
-	return "demo_user"
+func (m Demo) TableName() string {
+	return "demo"
 }
 
 type Gender int

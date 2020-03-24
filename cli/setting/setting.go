@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/teamlint/ardan/cli/lib"
+	"github.com/teamlint/ardan/pkg"
 )
 
 type TmplType = string
@@ -33,22 +33,22 @@ type Setting struct {
 	DBDriver  string   // database driver name
 	DBName    string   // database name
 	DBConnStr string   // database connection string
-	GoModName string
+	GoMod     string
 	// layout
-	OutputDir       string // output root dir
-	CmdDir          string // cmd dir
-	DocDir          string // documents root directory
-	AppDir          string // application dir
-	ModelDir        string // domain layer directory
-	ServiceDir      string // service layer directory
-	RepositoryDir   string // repository layer directory
-	ServerDir       string // server layer directory
-	ServerModuleDir string // server module directory
-	ServerGlobalDir string // server global directory
-	ControllerDir   string // controller directory
-	HandlerDir      string // handler directory
-	MiddlewareDir   string // middleware directory
-	Sample          bool
+	Output       string // output root dir
+	Cmd          string // cmd dir
+	Doc          string // documents root directory
+	App          string // application dir
+	Model        string // domain layer directory
+	Service      string // service layer directory
+	Repository   string // repository layer directory
+	Server       string // server layer directory
+	ServerModule string // server module directory
+	ServerGlobal string // server global directory
+	Controller   string // controller directory
+	Handler      string // handler directory
+	Middleware   string // middleware directory
+	Sample       bool
 }
 
 // Options setting options
@@ -60,6 +60,7 @@ type Options struct {
 	DBName    string // database name
 	DBConnStr string // database connection string
 	GoModName string
+	Config    string // config file
 	// project layout
 	CmdDir          string // command root directory
 	DocDir          string // documents root directory
@@ -78,36 +79,25 @@ type Options struct {
 
 // New init settings
 func New(opt Options) *Setting {
-	if !lib.Exists(opt.TmplDir) {
+	if !pkg.Exists(opt.TmplDir) {
 		msg := "template dir is not exists"
 		log.Fatal(msg)
 		panic(msg)
 	}
 
-	// cmdDir := filepath.Join(opt.OutputDir, opt.CmdDir)
-	// docDir := filepath.Join(opt.OutputDir, opt.DocDir)
-	// appDir := filepath.Join(opt.OutputDir, opt.AppDir)
-	// modelDir := filepath.Join(opt.OutputDir, opt.AppDir, opt.ModelDir)
-	// serviceDir := filepath.Join(opt.OutputDir, opt.AppDir, opt.ServiceDir)
-	// repositoryDir := filepath.Join(opt.OutputDir, opt.AppDir, opt.RepositoryDir)
-	// serverDir := filepath.Join(opt.OutputDir, opt.ServerDir)
-	// serverModuleDir := filepath.Join(opt.OutputDir, opt.ServerDir, opt.ServerModuleDir)
-	// serverGlobalDir := filepath.Join(opt.OutputDir, opt.ServerDir, opt.ServerGlobalDir)
-	// controllerDir := filepath.Join(opt.OutputDir, opt.ServerDir, opt.ControllerDir)
-	// handlerDir := filepath.Join(opt.OutputDir, opt.ServerDir, opt.HandlerDir)
-	// middlewareDir := filepath.Join(opt.OutputDir, opt.ServerDir, opt.MiddlewareDir)
-	cmdDir := opt.CmdDir
-	docDir := opt.DocDir
-	appDir := opt.AppDir
-	modelDir := opt.ModelDir
-	serviceDir := opt.ServiceDir
-	repositoryDir := opt.RepositoryDir
-	serverDir := opt.ServerDir
-	serverModuleDir := opt.ServerModuleDir
-	serverGlobalDir := opt.ServerGlobalDir
-	controllerDir := opt.ControllerDir
-	handlerDir := opt.HandlerDir
-	middlewareDir := opt.MiddlewareDir
+	outputDir := clean(opt.OutputDir)
+	cmdDir := clean(opt.CmdDir)
+	docDir := clean(opt.DocDir)
+	appDir := clean(opt.AppDir)
+	modelDir := clean(opt.ModelDir)
+	serviceDir := clean(opt.ServiceDir)
+	repositoryDir := clean(opt.RepositoryDir)
+	serverDir := clean(opt.ServerDir)
+	serverModuleDir := clean(opt.ServerModuleDir)
+	serverGlobalDir := clean(opt.ServerGlobalDir)
+	controllerDir := clean(opt.ControllerDir)
+	handlerDir := clean(opt.HandlerDir)
+	middlewareDir := clean(opt.MiddlewareDir)
 
 	instance := &Setting{
 		Layouts:   make([]string, 0),
@@ -116,22 +106,22 @@ func New(opt Options) *Setting {
 		DBDriver:  opt.DBDriver,
 		DBName:    opt.DBName,
 		DBConnStr: opt.DBConnStr,
-		GoModName: opt.GoModName,
+		GoMod:     opt.GoModName,
 		// layout
-		OutputDir:       opt.OutputDir,
-		CmdDir:          cmdDir,
-		DocDir:          docDir,
-		AppDir:          appDir,
-		ModelDir:        modelDir,
-		ServiceDir:      serviceDir,
-		RepositoryDir:   repositoryDir,
-		ServerDir:       serverDir,
-		ServerModuleDir: serverModuleDir,
-		ServerGlobalDir: serverGlobalDir,
-		ControllerDir:   controllerDir,
-		HandlerDir:      handlerDir,
-		MiddlewareDir:   middlewareDir,
-		Sample:          opt.Sample,
+		Output:       outputDir,
+		Cmd:          cmdDir,
+		Doc:          docDir,
+		App:          appDir,
+		Model:        modelDir,
+		Service:      serviceDir,
+		Repository:   repositoryDir,
+		Server:       serverDir,
+		ServerModule: serverModuleDir,
+		ServerGlobal: serverGlobalDir,
+		Controller:   controllerDir,
+		Handler:      handlerDir,
+		Middleware:   middlewareDir,
+		Sample:       opt.Sample,
 	}
 
 	err := instance.walkTemplates(opt)
@@ -150,7 +140,6 @@ func (s *Setting) walkTemplates(opt Options) error {
 	root := template.New("")
 
 	// log.Printf("root=%v\n", cleanRoot)
-	log.Printf("pfx=%v\n", pfx)
 	err := filepath.Walk(cleanRoot, func(path string, info os.FileInfo, e1 error) error {
 		if len(path) < pfx {
 			return nil
@@ -160,7 +149,7 @@ func (s *Setting) walkTemplates(opt Options) error {
 		// log.Printf("path_name=%v\n", name)
 		// is dir, make it
 		if info.IsDir() {
-			// if err := lib.Mkdir(filepath.Join(opt.OutputDir, name)); err != nil {
+			// if err := pkg.Mkdir(filepath.Join(opt.OutputDir, name)); err != nil {
 			// 	return err
 			// }
 			s.Layouts = append(s.Layouts, filepath.Join(opt.OutputDir, name))
@@ -173,7 +162,7 @@ func (s *Setting) walkTemplates(opt Options) error {
 				return e1
 			}
 
-			b, e2 := lib.GetFileContent(path)
+			b, e2 := pkg.GetFileContent(path)
 			if e2 != nil {
 				return e2
 			}
@@ -191,7 +180,7 @@ func (s *Setting) walkTemplates(opt Options) error {
 			if e1 != nil {
 				return e1
 			}
-			b, e2 := lib.GetFileContent(path)
+			b, e2 := pkg.GetFileContent(path)
 			if e2 != nil {
 				return e2
 			}
@@ -213,13 +202,16 @@ func (s *Setting) walkTemplates(opt Options) error {
 
 func defaultFuncMap() template.FuncMap {
 	fm := template.FuncMap{}
-	fm["clean"] = func(path string) string {
-		path = strings.TrimPrefix(path, ".")
-		path = strings.TrimPrefix(path, "/")
-		path = strings.TrimSuffix(path, "/")
-		return path
-	}
+	fm["clean"] = clean
+	fm["randomString"] = pkg.RandomString
 	return fm
+}
+
+func clean(path string) string {
+	path = strings.TrimPrefix(path, ".")
+	path = strings.TrimPrefix(path, "/")
+	path = strings.TrimSuffix(path, "/")
+	return path
 }
 
 // findDirective return the first line of a doc which contains a directive
@@ -246,9 +238,9 @@ func (s *Setting) TargetFile(srcname string) string {
 	case TmplTypeCode, TmplTypeSample, TmplTypeBuild:
 		dst := strings.TrimSuffix(srcname, ext)
 		// log.Printf("[TargetFile] dst=%v,ext=%v\n", dst, filepath.Ext(dst))
-		return filepath.Join(s.OutputDir, dst)
+		return filepath.Join(s.Output, dst)
 		// default:
 		// 	log.Printf("[TargetFile].default ext=%v\n", ext)
 	}
-	return filepath.Join(s.OutputDir, srcname)
+	return filepath.Join(s.Output, srcname)
 }

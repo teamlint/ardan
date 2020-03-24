@@ -1,0 +1,19 @@
+package {{.Setting.ServerModule}}
+
+import (
+	"github.com/gin-contrib/cors"
+	"github.com/teamlint/ardan/server"
+)
+
+type CORS struct{}
+
+func NewCORS() *CORS {
+	return &CORS{}
+}
+
+func (m *CORS) RegisterModule(srv *server.Server) {
+    config := cors.DefaultConfig()
+    config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "cache-control", "authorization"}
+    config.AllowAllOrigins = true
+    srv.Use(cors.New(config))
+}
