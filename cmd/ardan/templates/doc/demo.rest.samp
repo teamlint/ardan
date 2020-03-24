@@ -1,0 +1,40 @@
+# A REST console for Vim
+# https://github.com/diepm/vim-rest-console
+# Hit the trigger key (<C-j> by default).
+
+# global scope.
+http://localhost:1234
+Content-Type: "application/json"
+--
+# end global scope.
+
+# /demo/save
+--
+POST /demo/save 
+
+{
+    "id": "bpsshl3ipt306cb9n3f0",
+    "username": "ardan demo",
+    "is_approved": true,
+    "email": "ardan@gmail.com",
+    "bio": "this is tom",
+    "phone": "18630399999",
+    "posts": 65536
+}
+
+# /demo/list 
+-- 
+POST /demo/list 
+
+{
+    "page_number": 1,
+    "page_size": 5,
+    "order_by": "username desc",
+    "username": "ardan",
+    "is_approved": true
+}
+
+# /demo/info 
+--
+GET /demo/info/bpsshl3ipt306cb9n3f0
+

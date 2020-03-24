@@ -9,12 +9,13 @@ require (
 	github.com/gin-contrib/logger v0.0.2 // indirect
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-sql-driver/mysql v1.4.1
+	github.com/golang/snappy v0.0.1 // indirect
 	github.com/micro/go-micro v1.18.0
-	github.com/rs/xid v1.2.1 // indirect
 	github.com/rs/zerolog v1.18.0 // indirect
 	github.com/teamlint/container v1.0.1
 	github.com/teamlint/go-astra v1.3.0
 	github.com/urfave/cli/v2 v2.2.0
 	go.uber.org/dig v1.8.0
-	xorm.io/xorm v0.8.3-0.20200310061142-2f95c750c348
+	golang.org/x/tools v0.0.0-20191030062658-86caa796c7ab
+	xorm.io/xorm v1.0.0
 )

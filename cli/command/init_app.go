@@ -1,7 +1,6 @@
 package command
 
 import (
-	"log"
 	"strings"
 
 	"github.com/urfave/cli/v2"
@@ -18,13 +17,15 @@ var InitApp = &cli.Command{
 func initAppCode(c *cli.Context) error {
 	// code
 	for _, name := range Setting.Codes {
-		log.Printf("[init.app] path=%v,appDir=%v\n", name, Setting.App)
+		// log.Printf("[init.app] path=%v,appDir=%v\n", name, Setting.App)
 		if strings.HasPrefix(name, Setting.App) {
 			// tmpl
-			err := Render(Setting.TargetFile(name), name)
+			target := Setting.TargetFile(name)
+			err := Render(target, name)
 			if err != nil {
 				return err
 			}
+			info(c, "-- %v generated.\n", target)
 		}
 	}
 	// sample
@@ -32,10 +33,12 @@ func initAppCode(c *cli.Context) error {
 		for _, name := range Setting.Samples {
 			if strings.HasPrefix(name, Setting.App) {
 				// tmpl
-				err := Render(Setting.TargetFile(name), name)
+				target := Setting.TargetFile(name)
+				err := Render(target, name)
 				if err != nil {
 					return err
 				}
+				info(c, "-- %v generated.\n", target)
 			}
 		}
 	}

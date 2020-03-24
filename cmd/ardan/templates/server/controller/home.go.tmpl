@@ -33,12 +33,11 @@ func (c *HomeController) RegisterModule(s *server.Server) {
 }
 
 func (c *HomeController) Index(ctx *gin.Context) {
-	var err error
-	result:=map[string]interface{} {
-		"Name":"ardan",
-		"Page":"Home>Index",
-		"Message":"Welcome to used ardan!",
-		"CreatedAt":time.Now(),
+	result := map[string]interface{}{
+		"Name":      "ardan",
+		"Page":      "Home>Index",
+		"Message":   "Welcome to used ardan!",
+		"CreatedAt": time.Now(),
 	}
 	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", result))
 }

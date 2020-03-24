@@ -4,17 +4,20 @@ App:
   Debug: true
   # TimeFormat: "2006-01-02 15:04:05"
   # Charset: "UTF-8"
-  # Settings:
-  #    hello: "world"
+  Settings:
+    SyncDB: false
 
 
-# Server:
-    # HttpAddr: ":1234"
+Server:
+  HttpAddr: ":1234"
+  ReadTimeout: ""
+  WriteTimeout: ""
+  IdleTimeout: ""
 
 Databases:
-  UserDB:
-    DriverName: "mysql"
-    ConnString: "root:123456@/test?charset=utf8mb4&parseTime=True"
+  Ardan:
+    DriverName: "postgres"
+    ConnString: "postgresql://postgres:123456@localhost:5432/ardan?sslmode=disable"
     ConnMaxLifetime: "3m" # 3 minutes
     MaxOpenConns: 300
     MaxIdleConns: 10
@@ -22,5 +25,5 @@ Databases:
 
 JWT:
   Method: "HS256"
-  Secret: "{{randomString 8}}"
+  Secret: "{{randomString 16}}"
   Exp: "168h"

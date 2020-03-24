@@ -19,7 +19,7 @@ type DemoController struct{
 
 }
 
-func NewUserController(svc {{.Setting.Service}}.DemoService) *DemoController {
+func NewDemoController(svc {{.Setting.Service}}.DemoService) *DemoController {
 	return &DemoController{
 		DemoService: svc,
 	}
@@ -28,8 +28,44 @@ func NewUserController(svc {{.Setting.Service}}.DemoService) *DemoController {
 // server module register interface
 func (c *DemoController) RegisterModule(s *server.Server) {
 	g := s.Group("/demo")
-	g.GET("/list", c.List)
+	g.POST("/save", c.Save)
+	g.POST("/list", c.List)
 	g.GET("/info/:id", c.Info)
+}
+
+
+func (c *DemoController) Save(ctx *gin.Context) {
+	params := struct {
+		ID 				string 				 `json:"id" form:"id"`
+		Username        string               `json:"username" form:"username"`
+		IsApproved      bool       	         `json:"is_approved" form:"is_approved"`
+		Email      		string               `json:"email" form:"email"`
+		Gender       	{{.Setting.Model}}.Gender               `json:"gender" form:"gender"`
+		Bio 			string               `json:"bio" form:"bio"`
+		Phone 			string               `json:"phone" form:"phone"`
+		Posts      		int64                `json:"posts" form:"posts"`
+	}{}
+	if err := ctx.ShouldBind(&params); err != nil {
+		log.Err(err).Msg("[demo.Save] BindJSON")
+		ctx.JSON(http.StatusOK, api.NewResponseError("参数解析失败"))
+		return
+	}
+	item:={{.Setting.Model}}.Demo{
+		ID: 		params.ID,
+		Username: 	params.Username,
+		IsApproved: params.IsApproved,
+		Email: 		params.Email,
+		Gender: 	params.Gender,
+		Bio: 		params.Bio,
+		Phone: 		params.Phone,
+		Posts: 		params.Posts,
+	}
+	if err := c.DemoService.Save(&item); err != nil {
+		log.Err(err).Msg("[demo.Save] service load")
+		ctx.JSON(http.StatusOK, api.NewResponseError("保存信息失败"))
+		return
+	}
+	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", item.ID))
 }
 
 func (c *DemoController) List(ctx *gin.Context) {
@@ -38,7 +74,7 @@ func (c *DemoController) List(ctx *gin.Context) {
 		query.Base
 		query.Demo
 	}{}
-	if err = ctx.ShouldBindJSON(&data); err != nil {
+	if err = ctx.ShouldBindJSON(&params); err != nil {
 		log.Err(err).Msg("BindJSON")
 		ctx.JSON(http.StatusBadRequest, api.NewResponseError("参数解析失败"))
 		return
@@ -58,6 +94,14 @@ func (c *DemoController) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", result))
 }
 func (c *DemoController) Info(ctx *gin.Context) {
+	var result *{{.Setting.Model}}.Demo
+	var err error
 	id := ctx.Param("id")
-	ctx.String(http.StatusOK, "[DemoController] get user[%v] info", id)
+	result, err = c.DemoService.Get(id)
+	if err != nil {
+		log.Err(err).Msg("[demo.Save] srvice load")
+		ctx.JSON(http.StatusOK, api.NewResponseError("获取资源信息失败"))
+		return
+	}
+	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", result))
 }

@@ -12,6 +12,7 @@ import (
 
 	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Repository}}"
 	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Service}}"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.Server}}/{{.Setting.Controller}}"
 	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.Server}}/{{.Setting.ServerModule}}"
 	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.Server}}/{{.Setting.Middleware}}"
 	"github.com/teamlint/ardan/server"
@@ -23,8 +24,8 @@ func Start() {
 		// application
 		container.Provide({{.Setting.Repository}}.NewDB),
 		{{if .Setting.Sample}}
-		container.Provide({{.Setting.Repository}}.NewDemoUserRepository),
-		container.Provide({{.Setting.Service}}.NewDemoUserService),
+		container.Provide({{.Setting.Repository}}.NewDemoRepository),
+		container.Provide({{.Setting.Service}}.NewDemoService),
 		{{end}}
 		// modules
 		container.Provide({{.Setting.ServerModule}}.NewCORS, container.As(new(server.Module))),

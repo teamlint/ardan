@@ -33,7 +33,7 @@ func Setup(c *cli.Context) error {
 		if gomod == "" {
 			return ErrGoModNone
 		}
-		info(c, "go module name = %v\n", gomod)
+		info(c, "go.mod name = %v\n", gomod)
 		opts.GoModName = gomod
 	}
 	// cli.Exit(":(", -1)
@@ -43,7 +43,7 @@ func Setup(c *cli.Context) error {
 		Setting = setting.New(opts)
 	})
 
-	info(c, "setting init done.")
+	info(c, "setting init done.\n")
 	return nil
 }
 
@@ -83,7 +83,7 @@ func Render(fname string, tmplName string) error {
 			log.Printf("template[%v] format source error=%v\n", tmplName, err)
 			return err
 		}
-		log.Printf("format.source=%v\n", string(data))
+		// log.Printf("format.source=%v\n", string(data))
 		err = pkg.WriteFile(fname, data)
 		if err != nil {
 			log.Printf("template[%v] write file[%v] error=%v\n", tmplName, fname, err)

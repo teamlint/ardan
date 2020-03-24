@@ -14,15 +14,15 @@ type DemoService interface {
 	Paged(base *query.Base, q *query.Demo) ([]*{{.Setting.Model}}.Demo, int64, error)
 	Delete(id string) error 
 }
-type DemoService struct {
+type demoService struct {
     repo *{{.Setting.Repository}}.DemoRepository
 }
 
-func NewDemoService(repo *{{.Setting.Repository}}.DemoUserRepository) DemoService {
+func NewDemoService(repo *{{.Setting.Repository}}.DemoRepository) DemoService {
 	return &demoService{repo}
 }
 
-func (s *demoService) Save(item *{{.Setting}}.Demo) error {
+func (s *demoService) Save(item *{{.Setting.Model}}.Demo) error {
 	if item.ID != "" {
 		return s.repo.Update(nil, item)
 	}
@@ -43,7 +43,7 @@ func (s *demoService) List() ([]*{{.Setting.Model}}.Demo, error) {
 }
 
 func (s *demoService) Paged(base *query.Base, q *query.Demo) ([]*{{.Setting.Model}}.Demo, int64, error) {
-	return s.repo.Paged(sess, base.DefaultOrderBy("id desc"), q)
+	return s.repo.Paged(nil, base.DefaultOrderBy("id desc"), q)
 }
 
 func (s *demoService) Delete(id string) error {

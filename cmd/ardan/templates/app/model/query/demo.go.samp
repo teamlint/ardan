@@ -19,9 +19,9 @@ func (q *Demo) Options(sess *xorm.Session) *xorm.Session {
 		return sess
 	}
 	if q.Username != "" {
-		sess.Where("username=?", q.Username)
+		sess.Where("username ilike ?", "%" + q.Username + "%")
 	}
-	sess.Where("is_approved=?", q.IsApproved})
+	sess.Where("is_approved=?", q.IsApproved)
 
 	return sess
 }

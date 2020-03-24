@@ -15,7 +15,7 @@ var InitLayout = &cli.Command{
 
 func initLayout(c *cli.Context) error {
 	for _, l := range Setting.Layouts {
-		info(c, "[layout] = %v\n", l)
+		info(c, "*layout* = %v\n", l)
 		if err := pkg.Mkdir(l); err != nil {
 			return err
 		}
