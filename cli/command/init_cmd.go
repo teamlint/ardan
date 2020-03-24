@@ -22,7 +22,7 @@ func initCmdCode(c *cli.Context) error {
 			if err != nil {
 				return err
 			}
-			info(c, "-- %v generated.\n", target)
+			info(c, "-> %v\n", target)
 		}
 	}
 	// sample
@@ -34,7 +34,7 @@ func initCmdCode(c *cli.Context) error {
 				if err != nil {
 					return err
 				}
-				info(c, "-- %v generated.\n", target)
+				info(c, "-> %v\n", target)
 			}
 		}
 	}

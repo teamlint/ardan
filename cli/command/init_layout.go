@@ -14,11 +14,20 @@ var InitLayout = &cli.Command{
 }
 
 func initLayout(c *cli.Context) error {
+	// layout directory
 	for _, l := range Setting.Layouts {
-		info(c, "*layout* = %v\n", l)
 		if err := pkg.Mkdir(l); err != nil {
 			return err
 		}
+		info(c, "*layout* = %v\n", l)
+	}
+	// origin files
+	for _, o := range Setting.Origins {
+		dst := Setting.TargetFile(o)
+		if err := pkg.Copy(Setting.SourceFile(o), dst); err != nil {
+			return err
+		}
+		info(c, "=> %v\n", dst)
 	}
 	return nil
 }

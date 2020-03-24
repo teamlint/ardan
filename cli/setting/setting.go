@@ -13,6 +13,7 @@ import (
 type TmplType = string
 
 const (
+	TmplTypeOrigin TmplType = ".orig"
 	TmplTypeCode   TmplType = ".tmpl"
 	TmplTypeView   TmplType = ".tmpl"
 	TmplTypeSample TmplType = ".samp"
@@ -27,6 +28,7 @@ const (
 
 type Setting struct {
 	Template  *template.Template
+	Origins   []string // origin files
 	Layouts   []string // project layout dir names
 	Codes     []string // source code names
 	Samples   []string // sample names
@@ -35,6 +37,7 @@ type Setting struct {
 	DBConnStr string   // database connection string
 	GoMod     string
 	// layout
+	Source       string // source root dir
 	Output       string // output root dir
 	Cmd          string // cmd dir
 	Doc          string // documents root directory
@@ -85,6 +88,7 @@ func New(opt Options) *Setting {
 		panic(msg)
 	}
 
+	sourceDir := clean(opt.TmplDir)
 	outputDir := clean(opt.OutputDir)
 	cmdDir := clean(opt.CmdDir)
 	docDir := clean(opt.DocDir)
@@ -100,6 +104,7 @@ func New(opt Options) *Setting {
 	middlewareDir := clean(opt.MiddlewareDir)
 
 	instance := &Setting{
+		Origins:   make([]string, 0),
 		Layouts:   make([]string, 0),
 		Codes:     make([]string, 0),
 		Samples:   make([]string, 0),
@@ -108,6 +113,7 @@ func New(opt Options) *Setting {
 		DBConnStr: opt.DBConnStr,
 		GoMod:     opt.GoModName,
 		// layout
+		Source:       sourceDir,
 		Output:       outputDir,
 		Cmd:          cmdDir,
 		Doc:          docDir,
@@ -145,23 +151,26 @@ func (s *Setting) walkTemplates(opt Options) error {
 			return nil
 		}
 		name := path[pfx:]
+		if e1 != nil {
+			return e1
+		}
 		// log.Printf("path=%v\n", path)
 		// log.Printf("path_name=%v\n", name)
 		// is dir, make it
 		if info.IsDir() {
-			// if err := pkg.Mkdir(filepath.Join(opt.OutputDir, name)); err != nil {
-			// 	return err
-			// }
 			s.Layouts = append(s.Layouts, filepath.Join(opt.OutputDir, name))
+			return nil
+		}
+
+		// // is original file
+		if strings.HasSuffix(path, TmplTypeOrigin) {
+			// log.Printf("origin_name=%v\n", name)
+			s.Origins = append(s.Origins, name)
 			return nil
 		}
 
 		// // is template
 		if strings.HasSuffix(path, TmplTypeCode) {
-			if e1 != nil {
-				return e1
-			}
-
 			b, e2 := pkg.GetFileContent(path)
 			if e2 != nil {
 				return e2
@@ -231,11 +240,12 @@ func findDirective(doc []string, directive string) (string, bool) {
 
 	return "", false
 }
+
 func (s *Setting) TargetFile(srcname string) string {
 	ext := filepath.Ext(srcname)
 
 	switch ext {
-	case TmplTypeCode, TmplTypeSample, TmplTypeBuild:
+	case TmplTypeOrigin, TmplTypeCode, TmplTypeSample, TmplTypeBuild:
 		dst := strings.TrimSuffix(srcname, ext)
 		// log.Printf("[TargetFile] dst=%v,ext=%v\n", dst, filepath.Ext(dst))
 		return filepath.Join(s.Output, dst)
@@ -243,4 +253,8 @@ func (s *Setting) TargetFile(srcname string) string {
 		// 	log.Printf("[TargetFile].default ext=%v\n", ext)
 	}
 	return filepath.Join(s.Output, srcname)
+}
+
+func (s *Setting) SourceFile(srcname string) string {
+	return filepath.Join(s.Source, srcname)
 }

@@ -23,7 +23,7 @@ func initServerCode(c *cli.Context) error {
 			if err != nil {
 				return err
 			}
-			info(c, "-- %v generated.\n", target)
+			info(c, "-> %v\n", target)
 		}
 	}
 	// sample
@@ -35,7 +35,7 @@ func initServerCode(c *cli.Context) error {
 				if err != nil {
 					return err
 				}
-				info(c, "-- %v generated.\n", target)
+				info(c, "-> %v\n", target)
 			}
 		}
 	}

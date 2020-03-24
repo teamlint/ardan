@@ -1,0 +1,19 @@
+# Ardan web 开发样例
+
+## 目录结构
+
+### app 应用层
+- model 领域模型
+    * query 查询模型
+- repository 资源库
+- service 应用服务
+
+
+### cmd 命令行
+- server web服务主程序
+
+### server web服务
+- controller 控制器层
+- middleware 中间件
+- module 服务器模块配置
+- server.go 服务器主程序

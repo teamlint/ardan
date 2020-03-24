@@ -1,0 +1,29 @@
+# https://taskfile.dev
+
+version: '2'
+
+vars:
+  Product: 'ardan'
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.Product}}"
+      - task: run
+    silent: true
+
+  run:
+    desc: "go run server"
+    dir: cmd/server/
+    cmds:
+      - echo "server run "
+      - go run main.go
+    silent: true
+ 
+  release:
+    desc: "generate release"
+    cmds:
+      - echo "generate release"
+      - GOOS=linux go build -ldflags '-w -s' -o ./release/{{.Product}} ./cmd/server/main.go
+    silent: true
+

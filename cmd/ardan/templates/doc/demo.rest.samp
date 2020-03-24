@@ -13,7 +13,7 @@ Content-Type: "application/json"
 POST /demo/save 
 
 {
-    "id": "bpsshl3ipt306cb9n3f0",
+    "id": "",
     "username": "ardan demo",
     "is_approved": true,
     "email": "ardan@gmail.com",
