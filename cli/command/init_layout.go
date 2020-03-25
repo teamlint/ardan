@@ -1,6 +1,9 @@
 package command
 
 import (
+	"fmt"
+
+	"github.com/rakyll/statik/fs"
 	"github.com/teamlint/ardan/pkg"
 	"github.com/urfave/cli/v2"
 )
@@ -23,9 +26,14 @@ func initLayout(c *cli.Context) error {
 	}
 	// origin files
 	for _, o := range Setting.Origins {
+		b, err := fs.ReadFile(Setting.FileSystem, o)
+		if err != nil {
+			return fmt.Errorf("res.ReadFile file=%v err=%v\n", o, err)
+		}
+		// log.Printf("res.ReadFile src=%v content=%v\n", o, string(b))
 		dst := Setting.TargetFile(o)
-		if err := pkg.Copy(Setting.SourceFile(o), dst); err != nil {
-			return err
+		if err := pkg.WriteFile(dst, b); err != nil {
+			return fmt.Errorf("res.WriteFile src=%v dest=%v err=%v\n", o, dst, err)
 		}
 		info(c, "=> %v\n", dst)
 	}

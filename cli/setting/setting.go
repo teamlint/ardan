@@ -1,12 +1,16 @@
 package setting
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 
+	"github.com/rakyll/statik/fs"
+	_ "github.com/teamlint/ardan/cmd/ardan/res"
 	"github.com/teamlint/ardan/pkg"
 )
 
@@ -23,19 +27,22 @@ const (
 type Directive = string
 
 const (
+	TmplDir = "templates"
+	PkdgerMod
 	DirectiveSync Directive = "ardan:sync"
 )
 
 type Setting struct {
-	Template  *template.Template
-	Origins   []string // origin files
-	Layouts   []string // project layout dir names
-	Codes     []string // source code names
-	Samples   []string // sample names
-	DBDriver  string   // database driver name
-	DBName    string   // database name
-	DBConnStr string   // database connection string
-	GoMod     string
+	Template   *template.Template
+	FileSystem http.FileSystem
+	Origins    []string // origin files
+	Layouts    []string // project layout dir names
+	Codes      []string // source code names
+	Samples    []string // sample names
+	DBDriver   string   // database driver name
+	DBName     string   // database name
+	DBConnStr  string   // database connection string
+	GoMod      string
 	// layout
 	Source       string // source root dir
 	Output       string // output root dir
@@ -82,11 +89,11 @@ type Options struct {
 
 // New init settings
 func New(opt Options) *Setting {
-	if !pkg.Exists(opt.TmplDir) {
-		msg := "template dir is not exists"
-		log.Fatal(msg)
-		panic(msg)
-	}
+	// if !pkg.Exists(opt.TmplDir) {
+	// 	msg := "template dir is not exists"
+	// 	log.Fatal(msg)
+	// 	panic(msg)
+	// }
 
 	sourceDir := clean(opt.TmplDir)
 	outputDir := clean(opt.OutputDir)
@@ -130,7 +137,13 @@ func New(opt Options) *Setting {
 		Sample:       opt.Sample,
 	}
 
-	err := instance.walkTemplates(opt)
+	hfs, err := fs.New()
+	if err != nil {
+		panic(fmt.Errorf("res.FileSystem New err=%v\n", err))
+	}
+	instance.FileSystem = hfs
+
+	err = instance.walkTemplates(opt)
 	if err != nil {
 		log.Fatal(err)
 		panic(err)
@@ -141,67 +154,52 @@ func New(opt Options) *Setting {
 }
 
 func (s *Setting) walkTemplates(opt Options) error {
-	cleanRoot := filepath.Clean(opt.TmplDir)
-	pfx := len(cleanRoot) + 1
 	root := template.New("")
 
-	// log.Printf("root=%v\n", cleanRoot)
-	err := filepath.Walk(cleanRoot, func(path string, info os.FileInfo, e1 error) error {
-		if len(path) < pfx {
-			return nil
-		}
-		name := path[pfx:]
+	err := fs.Walk(s.FileSystem, "/", func(path string, info os.FileInfo, e1 error) error {
 		if e1 != nil {
 			return e1
 		}
 		// log.Printf("path=%v\n", path)
-		// log.Printf("path_name=%v\n", name)
-		// is dir, make it
 		if info.IsDir() {
-			s.Layouts = append(s.Layouts, filepath.Join(opt.OutputDir, name))
+			s.Layouts = append(s.Layouts, filepath.Join(opt.OutputDir, path))
 			return nil
 		}
-
-		// // is original file
+		// is original file
 		if strings.HasSuffix(path, TmplTypeOrigin) {
-			// log.Printf("origin_name=%v\n", name)
-			s.Origins = append(s.Origins, name)
+			s.Origins = append(s.Origins, path)
 			return nil
 		}
-
-		// // is template
+		// is template
 		if strings.HasSuffix(path, TmplTypeCode) {
-			b, e2 := pkg.GetFileContent(path)
+			b, e2 := fs.ReadFile(s.FileSystem, path)
 			if e2 != nil {
-				return e2
+				return fmt.Errorf("res.ReadFile file=%v err=%v\n", path, e2)
 			}
-			// log.Printf("temp_name=%v\n", name)
-			t := root.New(name).Funcs(defaultFuncMap()).Funcs(opt.FuncMap)
+			// log.Printf("res.origin.file=%v\n", string(b))
+			t := root.New(path).Funcs(defaultFuncMap()).Funcs(opt.FuncMap)
 			t, e2 = t.Parse(string(b))
 			if e2 != nil {
 				return e2
 			}
-			s.Codes = append(s.Codes, name)
+			s.Codes = append(s.Codes, path)
 			return nil
 		}
 		// is sample
 		if opt.Sample && strings.HasSuffix(path, TmplTypeSample) {
-			if e1 != nil {
-				return e1
-			}
-			b, e2 := pkg.GetFileContent(path)
+			b, e2 := fs.ReadFile(s.FileSystem, path)
 			if e2 != nil {
-				return e2
+				return fmt.Errorf("res.ReadFile file=%v err=%v\n", path, e2)
 			}
-			t := root.New(name).Funcs(defaultFuncMap()).Funcs(opt.FuncMap)
+			// log.Printf("res.origin.file=%v\n", string(b))
+			t := root.New(path).Funcs(defaultFuncMap()).Funcs(opt.FuncMap)
 			t, e2 = t.Parse(string(b))
 			if e2 != nil {
 				return e2
 			}
-			s.Samples = append(s.Samples, name)
+			s.Samples = append(s.Samples, path)
 			return nil
 		}
-
 		return nil
 	})
 
@@ -248,13 +246,15 @@ func (s *Setting) TargetFile(srcname string) string {
 	case TmplTypeOrigin, TmplTypeCode, TmplTypeSample, TmplTypeBuild:
 		dst := strings.TrimSuffix(srcname, ext)
 		// log.Printf("[TargetFile] dst=%v,ext=%v\n", dst, filepath.Ext(dst))
-		return filepath.Join(s.Output, dst)
-		// default:
-		// 	log.Printf("[TargetFile].default ext=%v\n", ext)
+		return clean(filepath.Join(s.Output, dst))
 	}
 	return filepath.Join(s.Output, srcname)
 }
 
 func (s *Setting) SourceFile(srcname string) string {
 	return filepath.Join(s.Source, srcname)
+}
+func (s *Setting) HasPrefix(path, layout string) bool {
+	name := strings.TrimPrefix(path, "/")
+	return strings.HasPrefix(name, layout)
 }

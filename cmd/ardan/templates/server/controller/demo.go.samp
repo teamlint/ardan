@@ -28,9 +28,47 @@ func NewDemoController(svc {{.Setting.Service}}.DemoService) *DemoController {
 // server module register interface
 func (c *DemoController) RegisterModule(s *server.Server) {
 	g := s.Group("/demo")
+	g.POST("/add", c.Add)
 	g.POST("/save", c.Save)
 	g.POST("/list", c.List)
 	g.GET("/info/:id", c.Info)
+}
+
+func (c *DemoController) Add(ctx *gin.Context) {
+	params := struct {
+		ID 				string 				 `json:"id" form:"id"`
+		Username        string               `json:"username" form:"username"`
+		IsApproved      bool       	         `json:"is_approved" form:"is_approved"`
+		Email      		string               `json:"email" form:"email"`
+		Gender       	{{.Setting.Model}}.Gender               `json:"gender" form:"gender"`
+		Bio 			string               `json:"bio" form:"bio"`
+		Phone 			string               `json:"phone" form:"phone"`
+		Posts      		int64                `json:"posts" form:"posts"`
+	}{}
+	if err := ctx.ShouldBind(&params); err != nil {
+		log.Err(err).Msg("[demo.Create] BindJSON")
+		ctx.JSON(http.StatusOK, api.NewResponseError("参数解析失败"))
+		return
+	}
+	item:={{.Setting.Model}}.Demo{
+		ID: 		params.ID,
+		Username: 	params.Username,
+		IsApproved: params.IsApproved,
+		Email: 		params.Email,
+		Gender: 	params.Gender,
+		Bio: 		params.Bio,
+		Phone: 		params.Phone,
+		Posts: 		params.Posts,
+	}
+	if item.ID == "" {
+		item.ID = model.NewID()
+	}
+	if err := c.DemoService.Add(&item); err != nil {
+		log.Err(err).Msg("[demo.Add] service load")
+		ctx.JSON(http.StatusOK, api.NewResponseError("添加信息失败"))
+		return
+	}
+	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", item.ID))
 }
 
 

@@ -7,6 +7,7 @@ import (
 )
 
 type DemoService interface {
+	Add(item *{{.Setting.Model}}.Demo) error
 	Save(item *{{.Setting.Model}}.Demo) error
 	Get(id string) (*{{.Setting.Model}}.Demo, error) 
 	GetByUsername(name string) (*{{.Setting.Model}}.Demo, error) 
@@ -20,6 +21,10 @@ type demoService struct {
 
 func NewDemoService(repo *{{.Setting.Repository}}.DemoRepository) DemoService {
 	return &demoService{repo}
+}
+
+func (s *demoService) Add(item *{{.Setting.Model}}.Demo) error {
+	return s.repo.Insert(nil, item)
 }
 
 func (s *demoService) Save(item *{{.Setting.Model}}.Demo) error {

@@ -1,0 +1,37 @@
+# https://taskfile.dev
+
+version: '2'
+
+vars:
+  Product: 'ardan'
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.Product}}"
+    desc: default task
+    silent: true
+  
+  run:
+    desc: go run 
+    deps: [res]
+    cmds:
+      - echo "go run"
+      - go run main.go
+    silent: true
+  res:
+    desc: embed files
+    cmds:
+      - echo "res generating..."
+      - statik -src=./templates -include=*.*  -p=res -f
+      - echo "res generated."
+    silent: true
+
+  release:
+    desc: "release"
+    deps: [res]
+    cmds:
+      - echo "release generating..."
+      - go build -ldflags '-w -s' -o ./release/{{.Product}} ./main.go
+      - echo "release generated."
+    silent: true

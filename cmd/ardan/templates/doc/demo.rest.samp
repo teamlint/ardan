@@ -8,13 +8,27 @@ Content-Type: "application/json"
 --
 # end global scope.
 
+# /demo/add
+--
+POST /demo/add 
+
+{
+    "id": "bpsshl3ipt306cb9n3f0",
+    "username": "ardan",
+    "is_approved": true,
+    "email": "ardan@gmail.com",
+    "bio": "this is ardan",
+    "phone": "18630399999",
+    "posts": 32768
+}
+
 # /demo/save
 --
 POST /demo/save 
 
 {
-    "id": "",
-    "username": "ardan demo",
+    "id": "bpsshl3ipt306cb9n3f0",
+    "username": "ardan update",
     "is_approved": true,
     "email": "ardan@gmail.com",
     "bio": "this is tom",

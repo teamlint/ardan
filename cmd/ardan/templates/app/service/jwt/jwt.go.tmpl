@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	"borderless/pom/app/model"
+	// "{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
 	"time"
 
 	jwtlib "github.com/dgrijalva/jwt-go"
@@ -9,13 +9,14 @@ import (
 )
 
 // NewToken 生成JWT Token
-func NewToken(userID string, loginType model.LoginType) *jwtlib.Token {
+// func NewToken(userID string, loginType {{.Setting.Model}}.LoginType) *jwtlib.Token {
+func NewToken(userID string) *jwtlib.Token {
 
 	token := jwtlib.New(jwtlib.GetSigningMethod(config.Get("JWT", "Method").String("HS256")))
 	// claims
 	claims := jwtlib.MapClaims{
-		"id":   userID,
-		"type": loginType,
+		"id": userID,
+		// "type": loginType,
 	}
 	exp := config.Get("JWT", "Exp").String("72h")
 	dur, err := time.ParseDuration(exp)

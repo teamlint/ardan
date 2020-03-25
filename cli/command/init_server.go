@@ -1,8 +1,6 @@
 package command
 
 import (
-	"strings"
-
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,7 +15,7 @@ var InitServer = &cli.Command{
 func initServerCode(c *cli.Context) error {
 	// code
 	for _, name := range Setting.Codes {
-		if strings.HasPrefix(name, Setting.Server) {
+		if Setting.HasPrefix(name, Setting.Server) {
 			target := Setting.TargetFile(name)
 			err := Render(target, name)
 			if err != nil {
@@ -29,7 +27,7 @@ func initServerCode(c *cli.Context) error {
 	// sample
 	if Setting.Sample {
 		for _, name := range Setting.Samples {
-			if strings.HasPrefix(name, Setting.Server) {
+			if Setting.HasPrefix(name, Setting.Server) {
 				target := Setting.TargetFile(name)
 				err := Render(target, name)
 				if err != nil {
