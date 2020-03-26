@@ -1,0 +1,59 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"time"
+    {{$drv:=.Setting.DBDriver}}
+	{{if eq $drv "postgres"}}
+	_ "github.com/lib/pq"
+	{{else if eq $drv "mysql"}}
+	_ "github.com/lib/pq"
+	{{else}}
+	_ "github.com/mattn/go-sqlite3"
+	{{end}}
+	"xorm.io/xorm"
+	"xorm.io/xorm/names"
+
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
+)
+
+
+func main() {
+	db,err := newDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	sync(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func newDB() (*xorm.Engine, error) {
+	db, err := xorm.NewEngine("{{.Setting.DBDriver}}", "{{.Setting.DBConnStr}}")
+	if err != nil {
+		return nil, err
+	}
+	db.SetMapper(names.GonicMapper{})
+	// ping
+	err = db.Ping()
+	if err != nil {
+		return nil, fmt.Errorf("sync.newDB err=%v\n", err)
+	}
+	db.ShowSQL(true)
+
+	return db, err
+}
+
+func sync(db *xorm.Engine) error{
+	err := db.Sync2(
+		{{range $bean:=.Beans}}
+		new({{$.Setting.Model}}.{{$bean}}),
+		{{end}}
+	)
+	if err != nil {
+		return fmt.Errorf("sync.sync err=%v\n",err)
+	}
+	return nil
+}

@@ -18,7 +18,7 @@ func initAppCode(c *cli.Context) error {
 		// log.Printf("[init.app] name=%v,appDir=%v\n", name, Setting.App)
 		if Setting.HasPrefix(name, Setting.App) {
 			target := Setting.TargetFile(name)
-			err := Render(target, name)
+			err := Render(target, name, nil)
 			if err != nil {
 				return err
 			}
@@ -31,7 +31,7 @@ func initAppCode(c *cli.Context) error {
 			if Setting.HasPrefix(name, Setting.App) {
 				// tmpl
 				target := Setting.TargetFile(name)
-				err := Render(target, name)
+				err := Render(target, name, nil)
 				if err != nil {
 					return err
 				}

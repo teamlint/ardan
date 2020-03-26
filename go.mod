@@ -23,6 +23,7 @@ require (
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/zerolog v1.18.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/teamlint/ardan/cmd/ardan v0.0.0-20200325111527-a8034cc74094
 	github.com/teamlint/container v1.0.1
 	github.com/teamlint/go-astra v1.3.0
 	github.com/urfave/cli/v2 v2.2.0

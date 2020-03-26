@@ -17,7 +17,7 @@ func initServerCode(c *cli.Context) error {
 	for _, name := range Setting.Codes {
 		if Setting.HasPrefix(name, Setting.Server) {
 			target := Setting.TargetFile(name)
-			err := Render(target, name)
+			err := Render(target, name, nil)
 			if err != nil {
 				return err
 			}
@@ -29,7 +29,7 @@ func initServerCode(c *cli.Context) error {
 		for _, name := range Setting.Samples {
 			if Setting.HasPrefix(name, Setting.Server) {
 				target := Setting.TargetFile(name)
-				err := Render(target, name)
+				err := Render(target, name, nil)
 				if err != nil {
 					return err
 				}

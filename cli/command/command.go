@@ -69,9 +69,9 @@ func info(c *cli.Context, msg string, args ...interface{}) {
 	fmt.Fprintf(c.App.Writer, LogPrefix+msg, args...)
 }
 
-func Render(fname string, tmplName string) error {
+func Render(fname string, tmplName string, data map[string]interface{}) error {
 	var buf bytes.Buffer
-	err := Setting.Template.ExecuteTemplate(&buf, tmplName, tmplData())
+	err := Setting.Template.ExecuteTemplate(&buf, tmplName, tmplData(data))
 	if err != nil {
 		log.Printf("template[%v] render error=%v\n", tmplName, err)
 		return err
@@ -109,8 +109,13 @@ func Render(fname string, tmplName string) error {
 	return nil
 }
 
-func tmplData() map[string]interface{} {
-	data := make(map[string]interface{})
-	data["Setting"] = Setting
-	return data
+func tmplData(data map[string]interface{}) map[string]interface{} {
+	main := make(map[string]interface{})
+	main["Setting"] = Setting
+	if data != nil && len(data) > 0 {
+		for k, v := range data {
+			main[k] = v
+		}
+	}
+	return main
 }

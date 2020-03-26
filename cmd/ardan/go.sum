@@ -384,6 +384,7 @@ github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81P
 github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/syndtr/goleveldb v1.0.0 h1:fBdIW9lB4Iz0n9khmH8w27SJ3QEJ7+IgjPEwGSZiFdE=
 github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
+github.com/teamlint/ardan/cmd/ardan v0.0.0-20200325111527-a8034cc74094/go.mod h1:XQHGgetxLjkc1RmWfwLFw0Vg4P44jW9FtwRlqHt9HGU=
 github.com/teamlint/container v1.0.1 h1:fg8ryeqAdi2qAIfydycECk116GnyxuKTkMvD8U+c0Hw=
 github.com/teamlint/container v1.0.1/go.mod h1:8u+wf31DTSFzPKmwfriSPF140A98DHexafhQJw0UtxY=
 github.com/teamlint/go-astra v1.3.0 h1:XmWBvtJb29xcu8DtbfVjEymN3oJUsI92xim9vDPXaLc=

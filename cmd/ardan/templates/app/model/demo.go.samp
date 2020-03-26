@@ -1,10 +1,11 @@
-//go:generate stringer -type Gender -linecomment -output demo_user_gender.go
 package {{.Setting.Model}}
 
 import (
 	"time"
 )
 
+//ardan:model sync
+//ardan:model gen --service DemoService --repository DcbaRepo --controller=DemoCtrl
 type Demo struct {
 	ID         string     `xorm:"not null pk unique CHAR(20) 'id'" json:"id"`
 	Username   string     `xorm:"not null index VARCHAR(100)" json:"username"`
@@ -25,6 +26,7 @@ func (m Demo) TableName() string {
 	return "demo"
 }
 
+//go:generate stringer -type Gender -linecomment -output demo_user_gender.go
 type Gender int
 
 const (

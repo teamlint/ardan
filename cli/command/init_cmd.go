@@ -16,7 +16,7 @@ func initCmdCode(c *cli.Context) error {
 	for _, name := range Setting.Codes {
 		if Setting.HasPrefix(name, Setting.Cmd) {
 			target := Setting.TargetFile(name)
-			err := Render(target, name)
+			err := Render(target, name, nil)
 			if err != nil {
 				return err
 			}
@@ -28,7 +28,7 @@ func initCmdCode(c *cli.Context) error {
 		for _, name := range Setting.Samples {
 			if Setting.HasPrefix(name, Setting.Cmd) {
 				target := Setting.TargetFile(name)
-				err := Render(target, name)
+				err := Render(target, name, nil)
 				if err != nil {
 					return err
 				}

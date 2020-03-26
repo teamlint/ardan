@@ -16,7 +16,7 @@ func initDocCode(c *cli.Context) error {
 	for _, name := range Setting.Codes {
 		if Setting.HasPrefix(name, Setting.Doc) {
 			target := Setting.TargetFile(name)
-			err := Render(target, name)
+			err := Render(target, name, nil)
 			if err != nil {
 				return err
 			}
@@ -28,7 +28,7 @@ func initDocCode(c *cli.Context) error {
 		for _, name := range Setting.Samples {
 			if Setting.HasPrefix(name, Setting.Doc) {
 				target := Setting.TargetFile(name)
-				err := Render(target, name)
+				err := Render(target, name, nil)
 				if err != nil {
 					return err
 				}
