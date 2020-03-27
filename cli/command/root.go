@@ -22,13 +22,14 @@ func Run() error {
 		Before:       before,
 		After:        after,
 		Action: func(c *cli.Context) error {
-			// cli.ShowAppHelp(c)
+			cli.ShowAppHelp(c)
 			// cli.ShowSubcommandHelp(c)
 			return nil
 		},
 		Commands: []*cli.Command{
 			Init,
 			Sync,
+			Gen,
 			NewCmd,
 		},
 	}
@@ -41,7 +42,7 @@ func flags() []cli.Flag {
 		&cli.StringFlag{
 			Name:        "tmpl",
 			Aliases:     []string{"t"},
-			Value:       "templates",
+			Value:       "temp",
 			Usage:       "template root dir",
 			Destination: &opts.TmplDir,
 		},

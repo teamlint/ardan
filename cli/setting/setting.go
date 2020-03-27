@@ -10,8 +10,8 @@ import (
 	"text/template"
 
 	"github.com/rakyll/statik/fs"
-	_ "github.com/teamlint/ardan/cmd/ardan/res"
 	"github.com/teamlint/ardan/pkg"
+	_ "github.com/teamlint/ardan/res"
 )
 
 type TmplType = string
@@ -27,9 +27,17 @@ const (
 type Directive = string
 
 const (
-	TmplDir = "templates"
-	PkdgerMod
+	// go files
+	GoMainFileTmpl = "main.go.tmpl"
+	GoMainFile     = "main.go"
+	GoGenFileTmpl  = "gen.go.tmpl"
+	GoFileSuffix   = ".go"
+	// template
+	InternalTmplDir = "templates"
+	SyncDir         = "sync"
+	// directive
 	DirectiveSync Directive = "ardan:sync"
+	DirectiveGen  Directive = "ardan:gen"
 )
 
 type Setting struct {
@@ -44,21 +52,23 @@ type Setting struct {
 	DBConnStr  string   // database connection string
 	GoMod      string
 	// layout
-	Source       string // source root dir
-	Output       string // output root dir
-	Cmd          string // cmd dir
-	Doc          string // documents root directory
-	App          string // application dir
-	Model        string // domain layer directory
-	Service      string // service layer directory
-	Repository   string // repository layer directory
-	Server       string // server layer directory
-	ServerModule string // server module directory
-	ServerGlobal string // server global directory
-	Controller   string // controller directory
-	Handler      string // handler directory
-	Middleware   string // middleware directory
-	Sample       bool
+	InternalTmplDir string // internal template dir
+	TmplDir         string // template dir
+	Output          string // output root dir
+	Cmd             string // cmd dir
+	Sync            string // sync dir
+	Doc             string // documents root directory
+	App             string // application dir
+	Model           string // domain layer directory
+	Service         string // service layer directory
+	Repository      string // repository layer directory
+	Server          string // server layer directory
+	ServerModule    string // server module directory
+	ServerGlobal    string // server global directory
+	Controller      string // controller directory
+	Handler         string // handler directory
+	Middleware      string // middleware directory
+	Sample          bool
 }
 
 // Options setting options
@@ -89,13 +99,7 @@ type Options struct {
 
 // New init settings
 func New(opt Options) *Setting {
-	// if !pkg.Exists(opt.TmplDir) {
-	// 	msg := "template dir is not exists"
-	// 	log.Fatal(msg)
-	// 	panic(msg)
-	// }
-
-	sourceDir := clean(opt.TmplDir)
+	tmplDir := clean(opt.TmplDir)
 	outputDir := clean(opt.OutputDir)
 	cmdDir := clean(opt.CmdDir)
 	docDir := clean(opt.DocDir)
@@ -119,8 +123,11 @@ func New(opt Options) *Setting {
 		DBName:    opt.DBName,
 		DBConnStr: opt.DBConnStr,
 		GoMod:     opt.GoModName,
+		// internal
+		InternalTmplDir: InternalTmplDir,
+		Sync:            SyncDir,
 		// layout
-		Source:       sourceDir,
+		TmplDir:      tmplDir,
 		Output:       outputDir,
 		Cmd:          cmdDir,
 		Doc:          docDir,
@@ -221,24 +228,6 @@ func clean(path string) string {
 	return path
 }
 
-// findDirective return the first line of a doc which contains a directive
-// the directive and '//' are removed
-func findDirective(doc []string, directive string) (string, bool) {
-	if len(doc) < 1 {
-		return "", false
-	}
-
-	// check lines of doc for directive
-	for _, c := range doc {
-		t := strings.TrimLeft(c, "/")
-		if strings.HasPrefix(t, directive) {
-			return c, true
-		}
-	}
-
-	return "", false
-}
-
 func (s *Setting) TargetFile(srcname string) string {
 	ext := filepath.Ext(srcname)
 
@@ -252,9 +241,25 @@ func (s *Setting) TargetFile(srcname string) string {
 }
 
 func (s *Setting) SourceFile(srcname string) string {
-	return filepath.Join(s.Source, srcname)
+	return filepath.Join(s.InternalTmplDir, srcname)
 }
+
+func (s *Setting) TmplFile(path ...string) string {
+	root := []string{"/"}
+	root = append(root, path...)
+	return filepath.Join(root...)
+}
+
 func (s *Setting) HasPrefix(path, layout string) bool {
 	name := strings.TrimPrefix(path, "/")
 	return strings.HasPrefix(name, layout)
+}
+
+func (s *Setting) HasDirective(doc, directive string) (string, bool) {
+	doc = strings.TrimPrefix(doc, "//")
+	doc = strings.TrimPrefix(doc, " ")
+	return doc, strings.HasPrefix(doc, directive)
+}
+func (s *Setting) IsGen(path string) bool {
+	return strings.HasSuffix(path, GoGenFileTmpl)
 }

@@ -160,3 +160,19 @@ func Truncate(path string, size int) error {
 func WriteFile(path string, content []byte) error {
 	return putContents(path, content, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 }
+
+// DeleteFile delete file
+func DeleteFile(filename string, delDir bool) error {
+	dir := Dir(filename)
+	err := os.Remove(filename)
+	if err != nil {
+		return err
+	}
+	if delDir {
+		err = os.Remove(dir)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

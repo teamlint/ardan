@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"go/format"
 	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -14,16 +16,25 @@ import (
 	"github.com/teamlint/ardan/cli/setting"
 	"github.com/teamlint/ardan/pkg"
 	"github.com/urfave/cli/v2"
+	"github.com/vetcher/go-astra"
+	"github.com/vetcher/go-astra/types"
 )
 
 const (
 	LogPrefix = "[ardan] "
 )
 
+type Model struct {
+	Name      string
+	Directive string
+	Struct    types.Struct
+}
+
 var (
-	once         sync.Once
-	Setting      *setting.Setting
-	ErrGoModNone = errors.New("please use `go mod init` or use `--mod` global options\n")
+	once             sync.Once
+	Setting          *setting.Setting
+	ErrGoModNone     = errors.New("please use `go mod init` or use `--mod` global options\n")
+	ErrDBConnStrNone = errors.New("please use `--db-conn` global options setting database connection string\n")
 )
 
 func Setup(c *cli.Context) error {
@@ -33,17 +44,16 @@ func Setup(c *cli.Context) error {
 		if gomod == "" {
 			return ErrGoModNone
 		}
-		info(c, "go.mod name = %v\n", gomod)
+		// info(c, "go.mod name = %v\n", gomod)
 		opts.GoModName = gomod
 	}
-	// cli.Exit(":(", -1)
 
 	// init setting
 	once.Do(func() {
 		Setting = setting.New(opts)
 	})
 
-	info(c, "setting init done.\n")
+	// info(c, "setting init done.\n")
 	return nil
 }
 
@@ -60,8 +70,31 @@ func readGoMod() string {
 		return ""
 	}
 	res := strings.Trim(result.Stdout, "\n")
-
 	return res
+
+}
+
+func GoBuild(dir string, source string, name string) error {
+	return nil
+}
+
+func GoRun(dir string, main string) (string, error) {
+	cmd := execute.ExecTask{
+		Command: "go",
+		// Args:         []string{"run", "-ldflags", `"-w -s"`, "-o", name, source},
+		Args:         []string{"run", main},
+		PrintCommand: false, // print command
+		Cwd:          dir,
+		// - GOOS=linux go build -ldflags '-w -s' -o ./release/{{.Product}} ./cmd/server/main.go
+	}
+	result, err := cmd.Execute()
+	if err != nil {
+		return "", fmt.Errorf("GoRun err=%v\n", err)
+	}
+	if result.ExitCode != 0 {
+		return "", fmt.Errorf("GoRun err=%v, ExitCode=%v\n", err, result.ExitCode)
+	}
+	return result.Stdout, nil
 
 }
 
@@ -118,4 +151,41 @@ func tmplData(data map[string]interface{}) map[string]interface{} {
 		}
 	}
 	return main
+}
+
+func ParseModelFiles(c *cli.Context, directive setting.Directive) ([]*Model, error) {
+	beans := make([]*Model, 0)
+	info(c, "ParseModelFiles starting...\n")
+	root := filepath.Join(Setting.Output, Setting.App, Setting.Model)
+	err := filepath.Walk(root, func(path string, fi os.FileInfo, e1 error) error {
+		if fi.IsDir() {
+			return nil
+		}
+		info(c, "\tParseModelFiles path=%v\n", path)
+		tf, err := astra.ParseFile(path)
+		if err != nil {
+			return fmt.Errorf("ParseModelFiles err=%v\n", err)
+		}
+		beans = append(beans, parseModelDiretive(c, tf, directive)...)
+		return err
+	})
+	if err != nil {
+		return nil, fmt.Errorf("walk model err=%v\n", err)
+	}
+	info(c, "ParseModelFiles completed.\n")
+	return beans, nil
+}
+
+func parseModelDiretive(c *cli.Context, tf *types.File, directive setting.Directive) []*Model {
+	beans := make([]*Model, 0)
+	for _, m := range tf.Structures {
+		info(c, "\tparseSyncModel model.Docs=%v\n", m.Docs)
+		for _, doc := range m.Docs {
+			if dire, ok := Setting.HasDirective(doc, directive); ok {
+				info(c, "\tfound model=%v, directive=%v\n", m.Name, dire)
+				beans = append(beans, &Model{Name: m.Name, Directive: dire, Struct: m})
+			}
+		}
+	}
+	return beans
 }

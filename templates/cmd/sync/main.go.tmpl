@@ -48,8 +48,8 @@ func newDB() (*xorm.Engine, error) {
 
 func sync(db *xorm.Engine) error{
 	err := db.Sync2(
-		{{range $bean:=.Beans}}
-		new({{$.Setting.Model}}.{{$bean}}),
+		{{range $model:=.Models}}
+		new({{$.Setting.Model}}.{{$model.Name}}),
 		{{end}}
 	)
 	if err != nil {

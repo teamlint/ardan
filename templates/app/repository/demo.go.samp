@@ -1,0 +1,179 @@
+package {{.Setting.Repository}}
+
+import (
+	"errors"
+	"log"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}/query"
+	"xorm.io/xorm"
+)
+
+type DemoRepository struct {
+	*xorm.Engine
+}
+
+func NewDemoRepository(db *xorm.Engine) *DemoRepository {
+	return &DemoRepository{db}
+}
+
+// Insert insert item into database
+func (r *DemoRepository) Insert(sess *xorm.Session, item *{{.Setting.Model}}.Demo) error {
+	if sess == nil {
+		sess = r.NewSession()
+		defer sess.Close()
+	}
+	_, err := sess.Insert(item)
+	return err
+}
+
+// Inserts batch insert items into database
+func (r *DemoRepository) Inserts(sess *xorm.Session, items []*{{.Setting.Model}}.Demo) error {
+	if sess == nil {
+		sess = r.NewSession()
+	}
+	_, err := sess.Insert(&items)
+	return err
+}
+
+// Get get an item from database
+func (r *DemoRepository) Get(sess *xorm.Session, id string, unscoped bool) (*{{.Setting.Model}}.Demo, error) {
+	var item {{.Setting.Model}}.Demo
+	if sess == nil {
+		sess = r.NewSession()
+		defer sess.Close()
+	}
+	if id == "" {
+		return nil, {{.Setting.Model}}.ErrPKNotFound
+	}
+	sess = sess.ID(id)
+	if unscoped {
+		sess = sess.Unscoped()
+	}
+	has, err := sess.Get(&item)
+	if has {
+		return &item, err
+	}
+	return nil, {{.Setting.Model}}.ErrNotFound
+}
+
+// GetBy 根据查询条件获取单条资源
+func (r *DemoRepository) GetBy(sess *xorm.Session, query interface{}, args ...interface{}) (*{{.Setting.Model}}.Demo, error) {
+	var item {{.Setting.Model}}.Demo
+	if sess == nil {
+		sess = r.NewSession()
+		defer sess.Close()
+		sess = sess.OrderBy("id desc")
+	}
+
+	if query != nil {
+		sess = sess.Where(query, args...)
+	}
+	has, err := sess.Get(&item)
+	if has {
+		return &item, err
+	}
+	return nil, {{.Setting.Model}}.ErrNotFound
+}
+
+// Find 获取资源列表
+func (r *DemoRepository) Find(sess *xorm.Session, opts ...SessionOptions) ([]*{{.Setting.Model}}.Demo, error) {
+	var items []*{{.Setting.Model}}.Demo
+	if sess == nil {
+		sess = r.NewSession()
+		defer sess.Close()
+		sess = sess.OrderBy("id desc")
+	}
+	// options
+	for _, opt := range opts {
+		opt.Options(sess)
+	}
+	return items, sess.Find(&items)
+}
+
+// Paged 获取分页列表
+func (r *DemoRepository) Paged(sess *xorm.Session, base *query.Base, opts ...SessionOptions) ([]*{{.Setting.Model}}.Demo, int64, error) {
+	var items []*{{.Setting.Model}}.Demo
+	var totals int64
+	var err error
+	if sess == nil {
+		sess = r.NewSession()
+		defer sess.Close()
+		sess = sess.OrderBy("id desc")
+	}
+	// query
+	sess = base.Options(sess)
+	// options
+	for _, opt := range opts {
+		opt.Options(sess)
+	}
+	totals, err = sess.FindAndCount(&items)
+	if err != nil {
+		return nil, totals, err
+	}
+
+	return items, totals, err
+}
+
+// UpdateData update to database use by map[string]interface{}
+func (r *DemoRepository) UpdateData(sess *xorm.Session, id string, data {{.Setting.Model}}.Data) error {
+	if sess == nil {
+		sess = r.NewSession()
+		defer sess.Close()
+	}
+	if id == "" {
+		return {{.Setting.Model}}.ErrPKNotFound
+	}
+	sess = sess.Table(new({{.Setting.Model}}.Demo)).ID(id)
+	_, err := sess.Update(data)
+	return err
+}
+
+// Update 更新指定列,如果不指定列,更新所有列
+func (r *DemoRepository) Update(sess *xorm.Session, item *{{.Setting.Model}}.Demo, cols ...string) error {
+	if sess == nil {
+		sess = r.NewSession()
+		defer sess.Close()
+	}
+	if item.ID == "" {
+		return {{.Setting.Model}}.ErrPKNotFound
+	}
+	sess = sess.ID(item.ID)
+	if len(cols) > 0 {
+		sess = sess.Cols(cols...)
+	} else {
+		sess = sess.AllCols()
+	}
+	_, err := sess.Update(item)
+	return err
+}
+
+// Updates 更新所有
+func (r *DemoRepository) Updates(sess *xorm.Session, item *{{.Setting.Model}}.Demo, opts ...SessionOptions) error {
+	if sess == nil {
+		sess = r.NewSession()
+		defer sess.Close()
+	}
+	for _, opt := range opts {
+		opt.Options(sess)
+	}
+	_, err := sess.Update(item)
+	return err
+}
+
+// Delete 删除
+func (r *DemoRepository) Delete(sess *xorm.Session, id string, unscoped bool) error {
+	if sess == nil {
+		sess = r.NewSession()
+		defer sess.Close()
+	}
+	if id == "" {
+		return {{.Setting.Model}}.ErrPKNotFound
+	}
+	sess = sess.ID(id)
+	if unscoped {
+		sess = sess.Unscoped()
+	}
+	_, err := sess.Delete(new({{.Setting.Model}}.Demo))
+	return err
+}
+

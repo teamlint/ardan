@@ -17,16 +17,17 @@ func NewLogger() *Logger {
 }
 
 func (m *Logger) RegisterModule(srv *server.Server) {
-    zerolog.SetGlobalLevel(zerolog.Disabled)
+    zerolog.SetGlobalLevel(zerolog.ErrorLevel)
     if config.App().Debug {
         zerolog.SetGlobalLevel(zerolog.DebugLevel)
-        zlog.Logger = zlog.Output(
-            zerolog.ConsoleWriter{
-                Out:     os.Stderr,
-                NoColor: false,
-            },
-        )
     }
+	// log output, must be
+	zlog.Logger = zlog.Output(
+		zerolog.ConsoleWriter{
+			Out:     os.Stderr,
+			NoColor: false,
+		},
+	)
 
     srv.Use(logger.SetLogger())
 }

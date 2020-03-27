@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
-//ardan:model sync
-//ardan:model gen --service DemoService --repository DcbaRepo --controller=DemoCtrl
+//ardan:sync
+//ardan:gen --service DemoService --repository --controller=DemoCtrl
 type Demo struct {
 	ID         string     `xorm:"not null pk unique CHAR(20) 'id'" json:"id"`
 	Username   string     `xorm:"not null index VARCHAR(100)" json:"username"`
