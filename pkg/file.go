@@ -5,16 +5,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"reflect"
 )
 
 // Empty
 type Empty struct{}
-
-// GetPkgName get package name
-func GetPkgName() string {
-	return reflect.TypeOf(Empty{}).PkgPath()
-}
 
 // Exists
 func Exists(path string) bool {
@@ -175,4 +169,31 @@ func DeleteFile(filename string, delDir bool) error {
 		}
 	}
 	return nil
+}
+
+// Move 文件移动/重命名
+func Move(src string, dst string) error {
+	dir := Dir(dst)
+	if !Exists(dir) {
+		err := Mkdir(dir)
+		if err != nil {
+			return err
+		}
+	}
+	return os.Rename(src, dst)
+}
+
+// Rename 文件移动/重命名
+func Rename(src string, dst string) error {
+	return Move(src, dst)
+}
+
+// Filename 获取指定文件路径的文件名称
+func Filename(path string) string {
+	return filepath.Base(path)
+}
+
+// TempDir 系统临时目录
+func TempDir() string {
+	return os.TempDir()
 }

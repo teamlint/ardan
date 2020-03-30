@@ -8,16 +8,16 @@ import (
 	"xorm.io/xorm"
 )
 
-type {{.Name}}Repository struct {
+type {{.Model.Name}}Repository struct {
 	*xorm.Engine
 }
 
-func New{{.Name}}Repository(db *xorm.Engine) *{{.Name}}Repository {
-	return &{{.Name}}Repository{db}
+func New{{.Model.Name}}Repository(db *xorm.Engine) *{{.Model.Name}}Repository {
+	return &{{.Model.Name}}Repository{db}
 }
 
 // Insert insert item into database
-func (r *{{.Name}}Repository) Insert(sess *xorm.Session, item *{{.Setting.Model}}.{{.Name}}) error {
+func (r *{{.Model.Name}}Repository) Insert(sess *xorm.Session, item *{{.Setting.Model}}.{{.Model.Name}}) error {
 	if sess == nil {
 		sess = r.NewSession()
 		defer sess.Close()
@@ -27,7 +27,7 @@ func (r *{{.Name}}Repository) Insert(sess *xorm.Session, item *{{.Setting.Model}
 }
 
 // Inserts batch insert items into database
-func (r *{{.Name}}Repository) Inserts(sess *xorm.Session, items []*{{.Setting.Model}}.{{.Name}}) error {
+func (r *{{.Model.Name}}Repository) Inserts(sess *xorm.Session, items []*{{.Setting.Model}}.{{.Model.Name}}) error {
 	if sess == nil {
 		sess = r.NewSession()
 	}
@@ -36,8 +36,8 @@ func (r *{{.Name}}Repository) Inserts(sess *xorm.Session, items []*{{.Setting.Mo
 }
 
 // Get get an item from database
-func (r *{{.Name}}Repository) Get(sess *xorm.Session, id string, unscoped bool) (*{{.Setting.Model}}.{{.Name}}, error) {
-	var item {{.Setting.Model}}.{{.Name}}
+func (r *{{.Model.Name}}Repository) Get(sess *xorm.Session, id string, unscoped bool) (*{{.Setting.Model}}.{{.Model.Name}}, error) {
+	var item {{.Setting.Model}}.{{.Model.Name}}
 	if sess == nil {
 		sess = r.NewSession()
 		defer sess.Close()
@@ -57,8 +57,8 @@ func (r *{{.Name}}Repository) Get(sess *xorm.Session, id string, unscoped bool) 
 }
 
 // GetBy 根据查询条件获取单条资源
-func (r *{{.Name}}Repository) GetBy(sess *xorm.Session, query interface{}, args ...interface{}) (*{{.Setting.Model}}.{{.Name}}, error) {
-	var item {{.Setting.Model}}.{{.Name}}
+func (r *{{.Model.Name}}Repository) GetBy(sess *xorm.Session, query interface{}, args ...interface{}) (*{{.Setting.Model}}.{{.Model.Name}}, error) {
+	var item {{.Setting.Model}}.{{.Model.Name}}
 	if sess == nil {
 		sess = r.NewSession()
 		defer sess.Close()
@@ -76,8 +76,8 @@ func (r *{{.Name}}Repository) GetBy(sess *xorm.Session, query interface{}, args 
 }
 
 // Find 获取资源列表
-func (r *{{.Name}}Repository) Find(sess *xorm.Session, opts ...SessionOptions) ([]*{{.Setting.Model}}.{{.Name}}, error) {
-	var items []*{{.Setting.Model}}.{{.Name}}
+func (r *{{.Model.Name}}Repository) Find(sess *xorm.Session, opts ...SessionOptions) ([]*{{.Setting.Model}}.{{.Model.Name}}, error) {
+	var items []*{{.Setting.Model}}.{{.Model.Name}}
 	if sess == nil {
 		sess = r.NewSession()
 		defer sess.Close()
@@ -91,8 +91,8 @@ func (r *{{.Name}}Repository) Find(sess *xorm.Session, opts ...SessionOptions) (
 }
 
 // Paged 获取分页列表
-func (r *{{.Name}}Repository) Paged(sess *xorm.Session, base *query.Base, opts ...SessionOptions) ([]*{{.Setting.Model}}.{{.Name}}, int64, error) {
-	var items []*{{.Setting.Model}}.{{.Name}}
+func (r *{{.Model.Name}}Repository) Paged(sess *xorm.Session, base *query.Base, opts ...SessionOptions) ([]*{{.Setting.Model}}.{{.Model.Name}}, int64, error) {
+	var items []*{{.Setting.Model}}.{{.Model.Name}}
 	var totals int64
 	var err error
 	if sess == nil {
@@ -115,7 +115,7 @@ func (r *{{.Name}}Repository) Paged(sess *xorm.Session, base *query.Base, opts .
 }
 
 // UpdateData update to database use by map[string]interface{}
-func (r *{{.Name}}Repository) UpdateData(sess *xorm.Session, id string, data {{.Setting.Model}}.Data) error {
+func (r *{{.Model.Name}}Repository) UpdateData(sess *xorm.Session, id string, data {{.Setting.Model}}.Data) error {
 	if sess == nil {
 		sess = r.NewSession()
 		defer sess.Close()
@@ -123,13 +123,13 @@ func (r *{{.Name}}Repository) UpdateData(sess *xorm.Session, id string, data {{.
 	if id == "" {
 		return {{.Setting.Model}}.ErrPKNotFound
 	}
-	sess = sess.Table(new({{.Setting.Model}}.{{.Name}})).ID(id)
+	sess = sess.Table(new({{.Setting.Model}}.{{.Model.Name}})).ID(id)
 	_, err := sess.Update(data)
 	return err
 }
 
 // Update 更新指定列,如果不指定列,更新所有列
-func (r *{{.Name}}Repository) Update(sess *xorm.Session, item *{{.Setting.Model}}.{{.Name}}, cols ...string) error {
+func (r *{{.Model.Name}}Repository) Update(sess *xorm.Session, item *{{.Setting.Model}}.{{.Model.Name}}, cols ...string) error {
 	if sess == nil {
 		sess = r.NewSession()
 		defer sess.Close()
@@ -148,7 +148,7 @@ func (r *{{.Name}}Repository) Update(sess *xorm.Session, item *{{.Setting.Model}
 }
 
 // Updates 更新所有
-func (r *{{.Name}}Repository) Updates(sess *xorm.Session, item *{{.Setting.Model}}.{{.Name}}, opts ...SessionOptions) error {
+func (r *{{.Model.Name}}Repository) Updates(sess *xorm.Session, item *{{.Setting.Model}}.{{.Model.Name}}, opts ...SessionOptions) error {
 	if sess == nil {
 		sess = r.NewSession()
 		defer sess.Close()
@@ -161,7 +161,7 @@ func (r *{{.Name}}Repository) Updates(sess *xorm.Session, item *{{.Setting.Model
 }
 
 // Delete 删除
-func (r *{{.Name}}Repository) Delete(sess *xorm.Session, id string, unscoped bool) error {
+func (r *{{.Model.Name}}Repository) Delete(sess *xorm.Session, id string, unscoped bool) error {
 	if sess == nil {
 		sess = r.NewSession()
 		defer sess.Close()
@@ -173,7 +173,7 @@ func (r *{{.Name}}Repository) Delete(sess *xorm.Session, id string, unscoped boo
 	if unscoped {
 		sess = sess.Unscoped()
 	}
-	_, err := sess.Delete(new({{.Setting.Model}}.{{.Name}}))
+	_, err := sess.Delete(new({{.Setting.Model}}.{{.Model.Name}}))
 	return err
 }
 

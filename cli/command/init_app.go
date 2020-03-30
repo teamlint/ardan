@@ -16,7 +16,7 @@ func initAppCode(c *cli.Context) error {
 	// code
 	for _, name := range Setting.Codes {
 		// log.Printf("[init.app] name=%v,appDir=%v\n", name, Setting.App)
-		if Setting.HasPrefix(name, Setting.App) && !Setting.IsGen(name) {
+		if Setting.HasPrefix(name, Setting.App) {
 			target := Setting.TargetFile(name)
 			//
 			err := Render(target, name, nil)

@@ -1,6 +1,8 @@
 package setting
 
 import (
+	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,6 +16,11 @@ import (
 	_ "github.com/teamlint/ardan/res"
 )
 
+var (
+	ErrDirectiveNone = errors.New("Directive is none")
+	ErrFilenameNone  = errors.New("Filename is null")
+)
+
 type TmplType = string
 
 const (
@@ -22,6 +29,7 @@ const (
 	TmplTypeView   TmplType = ".tmpl"
 	TmplTypeSample TmplType = ".samp"
 	TmplTypeBuild  TmplType = ".ardan"
+	TmplTypeGen    TmplType = ".gen"
 )
 
 type Directive = string
@@ -30,8 +38,9 @@ const (
 	// go files
 	GoMainFileTmpl = "main.go.tmpl"
 	GoMainFile     = "main.go"
-	GoGenFileTmpl  = "gen.go.tmpl"
 	GoFileSuffix   = ".go"
+	// Iteration
+	IterationFileTmpl = "iteration"
 	// template
 	InternalTmplDir = "templates"
 	SyncDir         = "sync"
@@ -40,12 +49,21 @@ const (
 	DirectiveGen  Directive = "ardan:gen"
 )
 
+type GenSet struct {
+	Directive  string
+	All        bool
+	Repository string
+	Service    string
+	Controller string
+}
+
 type Setting struct {
 	Template   *template.Template
 	FileSystem http.FileSystem
 	Origins    []string // origin files
 	Layouts    []string // project layout dir names
 	Codes      []string // source code names
+	Gens       []string // gen code names
 	Samples    []string // sample names
 	DBDriver   string   // database driver name
 	DBName     string   // database name
@@ -118,6 +136,7 @@ func New(opt Options) *Setting {
 		Origins:   make([]string, 0),
 		Layouts:   make([]string, 0),
 		Codes:     make([]string, 0),
+		Gens:      make([]string, 0),
 		Samples:   make([]string, 0),
 		DBDriver:  opt.DBDriver,
 		DBName:    opt.DBName,
@@ -207,6 +226,20 @@ func (s *Setting) walkTemplates(opt Options) error {
 			s.Samples = append(s.Samples, path)
 			return nil
 		}
+		// is gen
+		if strings.HasSuffix(path, TmplTypeGen) {
+			b, e2 := fs.ReadFile(s.FileSystem, path)
+			if e2 != nil {
+				return fmt.Errorf("res.ReadFile file=%v err=%v\n", path, e2)
+			}
+			t := root.New(path).Funcs(defaultFuncMap()).Funcs(opt.FuncMap)
+			t, e2 = t.Parse(string(b))
+			if e2 != nil {
+				return e2
+			}
+			s.Gens = append(s.Gens, path)
+			return nil
+		}
 		return nil
 	})
 
@@ -228,10 +261,20 @@ func clean(path string) string {
 	return path
 }
 
-func (s *Setting) TargetFile(srcname string) string {
+func (s *Setting) TargetFile(srcname string, replName ...string) string {
 	ext := filepath.Ext(srcname)
 
 	switch ext {
+	case TmplTypeGen:
+		dst := strings.TrimSuffix(srcname, ext)
+		if s.IsIteration(srcname) {
+			if len(replName) < 1 {
+				panic(ErrFilenameNone)
+			}
+			dst = strings.Replace(dst, IterationFileTmpl, strings.ToLower(replName[0]), 1)
+		}
+		return clean(filepath.Join(s.Output, dst))
+
 	case TmplTypeOrigin, TmplTypeCode, TmplTypeSample, TmplTypeBuild:
 		dst := strings.TrimSuffix(srcname, ext)
 		// log.Printf("[TargetFile] dst=%v,ext=%v\n", dst, filepath.Ext(dst))
@@ -260,6 +303,53 @@ func (s *Setting) HasDirective(doc, directive string) (string, bool) {
 	doc = strings.TrimPrefix(doc, " ")
 	return doc, strings.HasPrefix(doc, directive)
 }
-func (s *Setting) IsGen(path string) bool {
-	return strings.HasSuffix(path, GoGenFileTmpl)
+
+func (s *Setting) IsIteration(path string) bool {
+	fname := pkg.Filename(path)
+	return strings.HasPrefix(fname, IterationFileTmpl)
+}
+
+func (s *Setting) IsService(path string) bool {
+	layout := filepath.Join(s.App, s.Service)
+	return strings.HasPrefix(path, layout)
+}
+
+func (s *Setting) IsRepository(path string) bool {
+	layout := filepath.Join(s.App, s.Repository)
+	return strings.HasPrefix(path, layout)
+}
+
+func (s *Setting) IsController(path string) bool {
+	layout := filepath.Join(s.Server, s.Controller)
+	return strings.HasPrefix(path, layout)
+}
+
+func (s *Setting) ParseDirectiveGen(doc string) (*GenSet, error) {
+	direc, ok := s.HasDirective(doc, DirectiveGen)
+	if !ok {
+		return nil, ErrDirectiveNone
+	}
+	args := strings.TrimPrefix(direc, DirectiveGen)
+	args = strings.TrimSpace(args)
+
+	var repository, service, controller string
+	var all bool
+
+	fs := flag.NewFlagSet("gen", flag.ContinueOnError)
+	fs.BoolVar(&all, "all", false, "gen all")
+	fs.StringVar(&repository, "repository", "", "gen repository")
+	fs.StringVar(&service, "service", "", "gen service")
+	fs.StringVar(&controller, "controller", "", "gen controller")
+	err := fs.Parse(strings.Split(args, " "))
+	if err != nil {
+		return nil, fmt.Errorf("parse %v err=%v\n", DirectiveGen, err)
+	}
+	return &GenSet{
+		Directive:  direc,
+		All:        all,
+		Repository: repository,
+		Service:    service,
+		Controller: controller,
+	}, nil
+
 }
