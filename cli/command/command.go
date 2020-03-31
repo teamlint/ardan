@@ -21,12 +21,16 @@ import (
 )
 
 const (
-	LogPrefix = "[ardan] "
+	LogPrefix      = "[ardan] "
+	RepositoryName = "Repository"
+	ServiceName    = "Service"
+	ControllerName = "Controller"
 )
 
 type Model struct {
 	Name      string
 	Directive string
+	Gen       setting.GenSet
 	Struct    types.Struct
 }
 
@@ -161,7 +165,7 @@ func ParseModelFiles(c *cli.Context, directive setting.Directive) ([]*Model, err
 		if fi.IsDir() {
 			return nil
 		}
-		info(c, "\tParseModelFiles path=%v\n", path)
+		// info(c, "\tParseModelFiles path=%v\n", path)
 		tf, err := astra.ParseFile(path)
 		if err != nil {
 			return fmt.Errorf("ParseModelFiles err=%v\n", err)
@@ -177,15 +181,33 @@ func ParseModelFiles(c *cli.Context, directive setting.Directive) ([]*Model, err
 }
 
 func parseModelDiretive(c *cli.Context, tf *types.File, directive setting.Directive) []*Model {
-	beans := make([]*Model, 0)
+	models := make([]*Model, 0)
 	for _, m := range tf.Structures {
-		info(c, "\tparseSyncModel model.Docs=%v\n", m.Docs)
+		info(c, "\tparseSyncModel model.Docs=%v, model=%v\n", m.Docs, m)
 		for _, doc := range m.Docs {
 			if dire, ok := Setting.HasDirective(doc, directive); ok {
-				info(c, "\tfound model=%v, directive=%v\n", m.Name, dire)
-				beans = append(beans, &Model{Name: m.Name, Directive: dire, Struct: m})
+				// gen direction
+				gs, err := Setting.ParseDirectiveGen(doc)
+				if err != nil {
+					log.Fatal(err)
+				}
+				// default names
+				if gs.Repository == "" {
+					gs.Repository = m.Name + RepositoryName
+				}
+				if gs.Service == "" {
+					gs.ServiceInterface = m.Name + ServiceName
+					gs.Service = pkg.LowerFirst(m.Name) + ServiceName
+				}
+				if gs.Controller == "" {
+					gs.Controller = m.Name + ControllerName
+				}
+				// other direction
+				model := Model{Name: m.Name, Directive: dire, Gen: *gs, Struct: m}
+				models = append(models, &model)
+				info(c, "found gen.model=%v, repository=%v, service=%v:%v, controller=%v\n", model.Name, model.Gen.Repository, model.Gen.Service, model.Gen.ServiceInterface, model.Gen.Controller)
 			}
 		}
 	}
-	return beans
+	return models
 }

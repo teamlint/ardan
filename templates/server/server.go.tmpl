@@ -21,10 +21,14 @@ import (
 // Start use teamlint container
 func Start() {
 	container.Build(
-		// application
+		// db
 		container.Provide({{.Setting.Repository}}.NewDB),
+		// repositories
 		{{if .Setting.Sample}}
 		container.Provide({{.Setting.Repository}}.NewDemoRepository),
+		{{end}}
+		// services
+		{{if .Setting.Sample}}
 		container.Provide({{.Setting.Service}}.NewDemoService),
 		{{end}}
 		// modules

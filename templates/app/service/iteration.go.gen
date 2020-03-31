@@ -1,0 +1,59 @@
+package {{.Setting.Service}}
+
+import (
+    "{{.Setting.GoMod}}/{{.Setting.Output|clean}}/{{.Setting.App}}/{{.Setting.Model}}"
+    "{{.Setting.GoMod}}/{{.Setting.Output|clean}}/{{.Setting.App}}/{{.Setting.Model}}/query"
+    "{{.Setting.GoMod}}/{{.Setting.Output|clean}}/{{.Setting.App}}/{{.Setting.Repository}}"
+)
+
+{{$ISvc:=.Model.Gen.ServiceInterface}}
+type {{$ISvc}} interface {
+	Add(item *{{.Setting.Model}}.{{.Model.Name}}) error
+	Save(item *{{.Setting.Model}}.{{.Model.Name}}) error
+	Get(id string) (*{{.Setting.Model}}.{{.Model.Name}}, error) 
+	GetBy(query interface{}, args ...interface{}) (*{{.Setting.Model}}.{{.Model.Name}}, error) 
+	List() ([]*{{.Setting.Model}}.{{.Model.Name}}, error)
+	Paged(base *query.Base, q *query.{{.Model.Name}}) ([]*{{.Setting.Model}}.{{.Model.Name}}, int64, error)
+	Delete(id string) error 
+}
+
+{{$Svc:=.Model.Gen.Service}}
+type {{$Svc}} struct {
+    repo *{{.Setting.Repository}}.{{.Model.Gen.Repository}}
+}
+
+func New{{$ISvc}}(repo *{{.Setting.Repository}}.{{.Model.Gen.Repository}}) {{$ISvc}} {
+	return &{{$Svc}}{repo}
+}
+
+func (s *{{$Svc}}) Add(item *{{.Setting.Model}}.{{.Model.Name}}) error {
+	return s.repo.Insert(nil, item)
+}
+
+func (s *{{$Svc}}) Save(item *{{.Setting.Model}}.{{.Model.Name}}) error {
+	if item.ID != "" {
+		return s.repo.Update(nil, item)
+	}
+	item.ID = {{.Setting.Model}}.NewID()
+	return s.repo.Insert(nil, item)
+}
+
+func (s *{{$Svc}}) Get(id string) (*{{.Setting.Model}}.{{.Model.Name}}, error) {
+	return s.repo.Get(nil, id, false)
+}
+
+func (s *{{$Svc}}) GetBy(query interface{}, args ...interface{}) (*{{.Setting.Model}}.{{.Model.Name}}, error) {
+	return s.repo.GetBy(nil, query, args)
+}
+
+func (s *{{$Svc}}) List() ([]*{{.Setting.Model}}.{{.Model.Name}}, error) {
+	return s.repo.Find(nil, nil)
+}
+
+func (s *{{$Svc}}) Paged(base *query.Base, q *query.{{.Model.Name}}) ([]*{{.Setting.Model}}.{{.Model.Name}}, int64, error) {
+	return s.repo.Paged(nil, base.DefaultOrderBy("id desc"), q)
+}
+
+func (s *{{$Svc}}) Delete(id string) error {
+	return s.repo.Delete(nil, id, false)
+}

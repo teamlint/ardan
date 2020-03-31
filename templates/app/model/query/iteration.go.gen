@@ -1,0 +1,23 @@
+package query
+
+import (
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
+	"fmt"
+
+	"xorm.io/xorm"
+)
+
+// {{.Model.Name}} model query
+type {{.Model.Name}} struct {
+	// TODO add custom query field
+}
+
+// Options query options 
+func (q *{{.Model.Name}}) Options(sess *xorm.Session) *xorm.Session {
+	if q == nil {
+		return sess
+	}
+	// TODO
+
+	return sess
+}

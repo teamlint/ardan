@@ -50,11 +50,12 @@ const (
 )
 
 type GenSet struct {
-	Directive  string
-	All        bool
-	Repository string
-	Service    string
-	Controller string
+	// Directive  string
+	All              bool
+	Repository       string
+	ServiceInterface string
+	Service          string
+	Controller       string
 }
 
 type Setting struct {
@@ -251,6 +252,7 @@ func defaultFuncMap() template.FuncMap {
 	fm := template.FuncMap{}
 	fm["clean"] = clean
 	fm["randomString"] = pkg.RandomString
+	fm["lower"] = pkg.Lower
 	return fm
 }
 
@@ -300,7 +302,6 @@ func (s *Setting) HasPrefix(path, layout string) bool {
 
 func (s *Setting) HasDirective(doc, directive string) (string, bool) {
 	doc = strings.TrimPrefix(doc, "//")
-	doc = strings.TrimPrefix(doc, " ")
 	return doc, strings.HasPrefix(doc, directive)
 }
 
@@ -345,11 +346,12 @@ func (s *Setting) ParseDirectiveGen(doc string) (*GenSet, error) {
 		return nil, fmt.Errorf("parse %v err=%v\n", DirectiveGen, err)
 	}
 	return &GenSet{
-		Directive:  direc,
-		All:        all,
-		Repository: repository,
-		Service:    service,
-		Controller: controller,
+		// Directive:  direc,
+		All:              all,
+		Repository:       repository,
+		ServiceInterface: service,
+		Service:          pkg.LowerFirst(service),
+		Controller:       controller,
 	}, nil
 
 }

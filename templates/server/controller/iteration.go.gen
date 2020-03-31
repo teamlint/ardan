@@ -1,0 +1,129 @@
+package {{.Setting.Controller}}
+
+import (
+	"net/http"
+
+	"github.com/jinzhu/copier"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}/query"
+	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Service}}"
+
+	"github.com/rs/zerolog/log"
+
+	"github.com/gin-gonic/gin"
+	api "github.com/teamlint/ardan/pkg/http"
+	"github.com/teamlint/ardan/server"
+)
+
+{{$Ctrl:=.Model.Gen.Controller}}
+{{$ISvc:=.Model.Gen.ServiceInterface}}
+{{$svc:=.Model.Gen.Service}}
+type {{$Ctrl}} struct{
+	{{$ISvc}}     {{.Setting.Service}}.{{$ISvc}}
+
+}
+
+func New{{$Ctrl}}({{$svc}} {{.Setting.Service}}.{{$ISvc}}) *{{$Ctrl}} {
+	return &{{$Ctrl}}{
+		{{$ISvc}}: {{$svc}},
+	}
+}
+
+// server module register interface
+func (c *{{$Ctrl}}) RegisterModule(s *server.Server) {
+	g := s.Group("/{{.Model.Name|lower}}")
+	g.POST("/add", c.Add)
+	g.POST("/save", c.Save)
+	g.POST("/list", c.List)
+	g.GET("/info/:id", c.Info)
+}
+
+func (c *{{$Ctrl}}) Add(ctx *gin.Context) {
+	var err error
+	params := struct {
+		// TODO add custom params
+	}{}
+	if err = ctx.ShouldBind(&params); err != nil {
+		log.Err(err).Str("controller","{{$Ctrl}}").Str("method","Add").Msg("cannot bind params")
+		ctx.JSON(http.StatusOK, api.NewResponseError("参数解析失败"))
+		return
+	}
+	var item {{.Setting.Model}}.{{.Model.Name}}
+	if err = copier.Copy(&item, &params); err!=nil{
+		log.Err(err).Str("controller","{{$Ctrl}}").Str("method","Add").Msg("cannot copy parasm")
+		ctx.JSON(http.StatusOK, api.NewResponseError("参数转换失败"))
+		return
+	}
+	if item.ID == "" {
+		item.ID = {{.Setting.Model}}.NewID()
+	}
+	if err = c.{{$ISvc}}.Add(&item); err != nil {
+		log.Err(err).Str("controller","{{$Ctrl}}").Str("method","Add").Msg("cannot load service")
+		ctx.JSON(http.StatusOK, api.NewResponseError("添加信息失败"))
+		return
+	}
+	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", item.ID))
+}
+
+
+func (c *{{$Ctrl}}) Save(ctx *gin.Context) {
+	var err error
+	params := struct {
+		// TODO add custom params
+	}{}
+	if err = ctx.ShouldBind(&params); err != nil {
+		log.Err(err).Str("controller","{{$Ctrl}}").Str("method","Save").Msg("cannot bind params")
+		ctx.JSON(http.StatusOK, api.NewResponseError("参数解析失败"))
+		return
+	}
+	var item {{.Setting.Model}}.{{.Model.Name}}
+	if err = copier.Copy(&item, &params); err!=nil{
+		log.Err(err).Str("controller","{{$Ctrl}}").Str("method","Save").Msg("cannot copy params")
+		ctx.JSON(http.StatusOK, api.NewResponseError("参数转换失败"))
+		return
+	}
+	if err = c.{{$ISvc}}.Save(&item); err != nil {
+		log.Err(err).Str("controller","{{$Ctrl}}").Str("method","Save").Msg("cannot load service")
+		ctx.JSON(http.StatusOK, api.NewResponseError("保存信息失败"))
+		return
+	}
+	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", item.ID))
+}
+
+func (c *{{$Ctrl}}) List(ctx *gin.Context) {
+	var err error
+	params := struct {
+		query.Base
+		query.{{.Model.Name}}
+	}{}
+	if err = ctx.ShouldBindJSON(&params); err != nil {
+		log.Err(err).Str("controller","{{$Ctrl}}").Str("method","List").Msg("cannot bind params")
+		ctx.JSON(http.StatusBadRequest, api.NewResponseError("参数解析失败"))
+		return
+	}
+	var totals int64
+	var items []*{{.Setting.Model}}.{{.Model.Name}}
+	items, totals, err = c.{{$ISvc}}.Paged(&params.Base, &params.{{.Model.Name}})
+	if err != nil {
+		log.Err(err).Str("controller","{{$Ctrl}}").Str("method","List").Msg("cannot load service")
+		ctx.JSON(http.StatusOK, api.NewResponseError("获取资源列表信息失败"))
+		return
+	}
+	result := {{.Setting.Model}}.PagedResult{
+		Totals: totals,
+		Items:  items,
+	}
+	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", result))
+}
+func (c *{{$Ctrl}}) Info(ctx *gin.Context) {
+	var result *{{.Setting.Model}}.{{.Model.Name}}
+	var err error
+	id := ctx.Param("id")
+	result, err = c.{{$ISvc}}.Get(id)
+	if err != nil {
+		log.Err(err).Str("controller","{{$Ctrl}}").Str("method","Info").Msg("cannot load service")
+		ctx.JSON(http.StatusOK, api.NewResponseError("获取资源信息失败"))
+		return
+	}
+	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", result))
+}

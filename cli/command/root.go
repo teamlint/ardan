@@ -83,7 +83,7 @@ func flags() []cli.Flag {
 		&cli.StringFlag{
 			Name:        "output",
 			Aliases:     []string{"o"},
-			Value:       "./output",
+			Value:       ".",
 			Usage:       "output directory",
 			Destination: &opts.OutputDir,
 		},

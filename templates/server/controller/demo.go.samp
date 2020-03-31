@@ -3,6 +3,7 @@ package {{.Setting.Controller}}
 import (
 	"net/http"
 
+	"github.com/jinzhu/copier"
 	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
 	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}/query"
 	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Service}}"
@@ -10,12 +11,12 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/teamlint/ardan/server"
 	api "github.com/teamlint/ardan/pkg/http"
+	"github.com/teamlint/ardan/server"
 )
 
 type DemoController struct{
-	DemoService     service.DemoService
+	DemoService     {{.Setting.Service}}.DemoService
 
 }
 
@@ -35,6 +36,7 @@ func (c *DemoController) RegisterModule(s *server.Server) {
 }
 
 func (c *DemoController) Add(ctx *gin.Context) {
+	var err error
 	params := struct {
 		ID 				string 				 `json:"id" form:"id"`
 		Username        string               `json:"username" form:"username"`
@@ -45,26 +47,22 @@ func (c *DemoController) Add(ctx *gin.Context) {
 		Phone 			string               `json:"phone" form:"phone"`
 		Posts      		int64                `json:"posts" form:"posts"`
 	}{}
-	if err := ctx.ShouldBind(&params); err != nil {
-		log.Err(err).Msg("[demo.Create] BindJSON")
+	if err = ctx.ShouldBind(&params); err != nil {
+		log.Err(err).Str("controller","DemoController").Str("method","Add").Msg("cannot bind params")
 		ctx.JSON(http.StatusOK, api.NewResponseError("参数解析失败"))
 		return
 	}
-	item:={{.Setting.Model}}.Demo{
-		ID: 		params.ID,
-		Username: 	params.Username,
-		IsApproved: params.IsApproved,
-		Email: 		params.Email,
-		Gender: 	params.Gender,
-		Bio: 		params.Bio,
-		Phone: 		params.Phone,
-		Posts: 		params.Posts,
+	var item {{.Setting.Model}}.Demo
+	if err = copier.Copy(&item, &params); err!=nil{
+		log.Err(err).Str("controller","DemoController").Str("method","Add").Msg("cannot copy params")
+		ctx.JSON(http.StatusOK, api.NewResponseError("参数转换失败"))
+		return
 	}
 	if item.ID == "" {
-		item.ID = model.NewID()
+		item.ID = {{.Setting.Model}}.NewID()
 	}
-	if err := c.DemoService.Add(&item); err != nil {
-		log.Err(err).Msg("[demo.Add] service load")
+	if err = c.DemoService.Add(&item); err != nil {
+		log.Err(err).Str("controller","DemoController").Str("method","Add").Msg("cannot load service")
 		ctx.JSON(http.StatusOK, api.NewResponseError("添加信息失败"))
 		return
 	}
@@ -73,6 +71,7 @@ func (c *DemoController) Add(ctx *gin.Context) {
 
 
 func (c *DemoController) Save(ctx *gin.Context) {
+	var err error
 	params := struct {
 		ID 				string 				 `json:"id" form:"id"`
 		Username        string               `json:"username" form:"username"`
@@ -83,23 +82,19 @@ func (c *DemoController) Save(ctx *gin.Context) {
 		Phone 			string               `json:"phone" form:"phone"`
 		Posts      		int64                `json:"posts" form:"posts"`
 	}{}
-	if err := ctx.ShouldBind(&params); err != nil {
-		log.Err(err).Msg("[demo.Save] BindJSON")
+	if err = ctx.ShouldBind(&params); err != nil {
+		log.Err(err).Str("controller","DemoController").Str("method","Save").Msg("cannot bind params")
 		ctx.JSON(http.StatusOK, api.NewResponseError("参数解析失败"))
 		return
 	}
-	item:={{.Setting.Model}}.Demo{
-		ID: 		params.ID,
-		Username: 	params.Username,
-		IsApproved: params.IsApproved,
-		Email: 		params.Email,
-		Gender: 	params.Gender,
-		Bio: 		params.Bio,
-		Phone: 		params.Phone,
-		Posts: 		params.Posts,
+	var item {{.Setting.Model}}.Demo
+	if err = copier.Copy(&item, &params); err!=nil{
+		log.Err(err).Str("controller","DemoController").Str("method","Save").Msg("cannot copy params")
+		ctx.JSON(http.StatusOK, api.NewResponseError("参数转换失败"))
+		return
 	}
-	if err := c.DemoService.Save(&item); err != nil {
-		log.Err(err).Msg("[demo.Save] service load")
+	if err = c.DemoService.Save(&item); err != nil {
+		log.Err(err).Str("controller","DemoController").Str("method","Save").Msg("cannot load service")
 		ctx.JSON(http.StatusOK, api.NewResponseError("保存信息失败"))
 		return
 	}
@@ -113,7 +108,7 @@ func (c *DemoController) List(ctx *gin.Context) {
 		query.Demo
 	}{}
 	if err = ctx.ShouldBindJSON(&params); err != nil {
-		log.Err(err).Msg("BindJSON")
+		log.Err(err).Str("controller","DemoController").Str("method","List").Msg("cannot bind params")
 		ctx.JSON(http.StatusBadRequest, api.NewResponseError("参数解析失败"))
 		return
 	}
@@ -121,7 +116,7 @@ func (c *DemoController) List(ctx *gin.Context) {
 	var items []*{{.Setting.Model}}.Demo
 	items, totals, err = c.DemoService.Paged(&params.Base, &params.Demo)
 	if err != nil {
-		log.Err(err).Msg("c.DemoService.Paged")
+		log.Err(err).Str("controller","DemoController").Str("method","List").Msg("cannot load service")
 		ctx.JSON(http.StatusOK, api.NewResponseError("获取资源列表信息失败"))
 		return
 	}
@@ -137,7 +132,7 @@ func (c *DemoController) Info(ctx *gin.Context) {
 	id := ctx.Param("id")
 	result, err = c.DemoService.Get(id)
 	if err != nil {
-		log.Err(err).Msg("[demo.Save] srvice load")
+		log.Err(err).Str("controller","DemoController").Str("method","Info").Msg("cannot load service")
 		ctx.JSON(http.StatusOK, api.NewResponseError("获取资源信息失败"))
 		return
 	}

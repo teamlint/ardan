@@ -17,6 +17,7 @@ require (
 	github.com/go-task/task v2.2.0+incompatible
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/huandu/xstrings v1.3.0 // indirect
+	github.com/jinzhu/copier v0.0.0-20190924061706-b57f9002281a
 	github.com/lib/pq v1.2.0
 	github.com/mattn/go-zglob v0.0.1 // indirect
 	github.com/micro/go-micro v1.18.0
