@@ -187,7 +187,7 @@ func parseModelDiretive(c *cli.Context, tf *types.File, directive setting.Direct
 		for _, doc := range m.Docs {
 			if dire, ok := Setting.HasDirective(doc, directive); ok {
 				model := Model{Name: m.Name, Directive: dire, Struct: m}
-				switch dire {
+				switch directive {
 				case setting.DirectiveGen:
 					// gen direction
 					gs, err := Setting.ParseDirectiveGen(doc)
@@ -206,11 +206,12 @@ func parseModelDiretive(c *cli.Context, tf *types.File, directive setting.Direct
 						gs.Controller = m.Name + ControllerName
 					}
 					model.Gen = *gs
+					info(c, "found gen.model=%v, directive=%v, repository=%v, service=%v:%v, controller=%v\n", model.Name, model.Directive, model.Gen.Repository, model.Gen.Service, model.Gen.ServiceInterface, model.Gen.Controller)
 				case setting.DirectiveSync:
 					// other direction
+					info(c, "found sync.model=%v, directive=%v\n", model.Name, model.Directive)
 				}
 				models = append(models, &model)
-				info(c, "found gen.model=%v, directive=%v, repository=%v, service=%v:%v, controller=%v\n", model.Name, model.Directive, model.Gen.Repository, model.Gen.Service, model.Gen.ServiceInterface, model.Gen.Controller)
 			}
 		}
 	}
