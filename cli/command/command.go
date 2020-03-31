@@ -170,6 +170,7 @@ func ParseModelFiles(c *cli.Context, directive setting.Directive) ([]*Model, err
 		if err != nil {
 			return fmt.Errorf("ParseModelFiles err=%v\n", err)
 		}
+		// info(c, "\tParseModelFiles ast=%+v\n", *tf)
 		beans = append(beans, parseModelDiretive(c, tf, directive)...)
 		return err
 	})
