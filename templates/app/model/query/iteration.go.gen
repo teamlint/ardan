@@ -1,9 +1,6 @@
 package query
 
 import (
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
-	"fmt"
-
 	"xorm.io/xorm"
 )
 

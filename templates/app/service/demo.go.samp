@@ -1,9 +1,9 @@
 package {{.Setting.Service}}
 
 import (
-    "{{.Setting.GoMod}}/{{.Setting.Output|clean}}/{{.Setting.App}}/{{.Setting.Model}}"
-    "{{.Setting.GoMod}}/{{.Setting.Output|clean}}/{{.Setting.App}}/{{.Setting.Model}}/query"
-    "{{.Setting.GoMod}}/{{.Setting.Output|clean}}/{{.Setting.App}}/{{.Setting.Repository}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Model}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Model .Setting.Query}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Repository}}"
 )
 
 type DemoService interface {

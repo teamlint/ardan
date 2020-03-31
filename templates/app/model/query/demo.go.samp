@@ -1,9 +1,6 @@
 package query
 
 import (
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
-	"fmt"
-
 	"xorm.io/xorm"
 )
 
@@ -19,7 +16,7 @@ func (q *Demo) Options(sess *xorm.Session) *xorm.Session {
 		return sess
 	}
 	if q.Username != "" {
-		sess.Where("username ilike ?", "%" + q.Username + "%")
+		sess.Where("username ilike ?", "%"+q.Username+"%")
 	}
 	sess.Where("is_approved=?", q.IsApproved)
 

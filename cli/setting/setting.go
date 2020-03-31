@@ -79,6 +79,7 @@ type Setting struct {
 	Doc             string // documents root directory
 	App             string // application dir
 	Model           string // domain layer directory
+	Query           string // domain layer query directory
 	Service         string // service layer directory
 	Repository      string // repository layer directory
 	Server          string // server layer directory
@@ -153,6 +154,7 @@ func New(opt Options) *Setting {
 		Doc:          docDir,
 		App:          appDir,
 		Model:        modelDir,
+		Query:        "query",
 		Service:      serviceDir,
 		Repository:   repositoryDir,
 		Server:       serverDir,
@@ -251,6 +253,7 @@ func (s *Setting) walkTemplates(opt Options) error {
 func defaultFuncMap() template.FuncMap {
 	fm := template.FuncMap{}
 	fm["clean"] = clean
+	fm["import"] = importPath
 	fm["randomString"] = pkg.RandomString
 	fm["lower"] = pkg.Lower
 	return fm
@@ -261,6 +264,20 @@ func clean(path string) string {
 	path = strings.TrimPrefix(path, "/")
 	path = strings.TrimSuffix(path, "/")
 	return path
+}
+
+func importPath(imps ...string) string {
+	var b strings.Builder
+	length := len(imps)
+	for i := 0; i < length; i++ {
+		if clean(imps[i]) != "" {
+			b.WriteString(imps[i])
+			if i < length-1 {
+				b.WriteString("/")
+			}
+		}
+	}
+	return b.String()
 }
 
 func (s *Setting) TargetFile(srcname string, replName ...string) string {

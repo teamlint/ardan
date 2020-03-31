@@ -3,13 +3,12 @@ package {{.Setting.Controller}}
 import (
 	"net/http"
 
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Model}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Model .Setting.Query}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Service}}"
+
 	"github.com/jinzhu/copier"
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}/query"
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Service}}"
-
 	"github.com/rs/zerolog/log"
-
 	"github.com/gin-gonic/gin"
 	api "github.com/teamlint/ardan/pkg/http"
 	"github.com/teamlint/ardan/server"

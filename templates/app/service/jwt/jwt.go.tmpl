@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	// "{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
 	"time"
 
 	jwtlib "github.com/dgrijalva/jwt-go"
@@ -9,7 +8,6 @@ import (
 )
 
 // NewToken 生成JWT Token
-// func NewToken(userID string, loginType {{.Setting.Model}}.LoginType) *jwtlib.Token {
 func NewToken(userID string) *jwtlib.Token {
 
 	token := jwtlib.New(jwtlib.GetSigningMethod(config.Get("JWT", "Method").String("HS256")))

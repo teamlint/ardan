@@ -10,11 +10,11 @@ import (
 	"github.com/teamlint/ardan/config"
 	"github.com/teamlint/container"
 
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Repository}}"
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Service}}"
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.Server}}/{{.Setting.Controller}}"
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.Server}}/{{.Setting.ServerModule}}"
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.Server}}/{{.Setting.Middleware}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Repository}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Service}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.Server .Setting.Controller}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.Server .Setting.ServerModule}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.Server .Setting.Middleware}}"
 	"github.com/teamlint/ardan/server"
 )
 

@@ -3,8 +3,8 @@ package {{.Setting.Repository}}
 import (
 	"errors"
 	"log"
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}/query"
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Model}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Model .Setting.Query}}"
 	"xorm.io/xorm"
 )
 

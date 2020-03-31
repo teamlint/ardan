@@ -1,10 +1,9 @@
 package {{.Setting.ServerModule}}
 
 import (
-	"{{.Setting.GoMod}}/{{.Setting.Output}}/{{.Setting.App}}/{{.Setting.Model}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Model}}"
 
 	"github.com/rs/zerolog/log"
-
 	"github.com/teamlint/ardan/config"
 	"github.com/teamlint/ardan/server"
 	"github.com/teamlint/container"

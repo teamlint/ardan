@@ -15,9 +15,9 @@ Server:
   IdleTimeout: ""
 
 Databases:
-  Ardan:
-    DriverName: "postgres"
-    ConnString: "postgresql://postgres:123456@localhost:5432/ardan?sslmode=disable"
+  {{.Setting.DBName}}:
+    DriverName: "{{.Setting.DBDriver}}"
+    ConnString: "{{.Setting.DBConnStr}}"
     ConnMaxLifetime: "3m" # 3 minutes
     MaxOpenConns: 300
     MaxIdleConns: 10

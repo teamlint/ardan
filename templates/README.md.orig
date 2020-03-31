@@ -18,4 +18,14 @@
 - module 服务器模块配置
 - server.go 服务器主程序
 
-    aaaa
+## 常用操作
+
+### 同步模型到数据库
+```golang
+ardan sync
+```
+
+### 生成资源库/应用服务/控制器
+```golang
+ardan gen
+```
