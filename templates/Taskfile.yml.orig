@@ -20,6 +20,20 @@ tasks:
       - echo "server run "
       - go run main.go
     silent: true
+
+  sync:
+    desc: "model sync"
+    cmds:
+      - echo "model sync"
+      - ardan -dc "postgres://postgres:123456@localhost:5432/ardan?sslmode=disable" sync
+    silent: true
+ 
+  gen:
+    desc: "ardan gen"
+    cmds:
+      - echo "ardan.gen repository/service/controller"
+      - ardan gen
+    silent: true
  
   release:
     desc: "release"

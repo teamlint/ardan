@@ -183,29 +183,34 @@ func ParseModelFiles(c *cli.Context, directive setting.Directive) ([]*Model, err
 func parseModelDiretive(c *cli.Context, tf *types.File, directive setting.Directive) []*Model {
 	models := make([]*Model, 0)
 	for _, m := range tf.Structures {
-		info(c, "\tparseSyncModel model.Docs=%v, model=%v\n", m.Docs, m)
+		// info(c, "\tparseSyncModel model.Docs=%v, model=%v\n", m.Docs, m)
 		for _, doc := range m.Docs {
 			if dire, ok := Setting.HasDirective(doc, directive); ok {
-				// gen direction
-				gs, err := Setting.ParseDirectiveGen(doc)
-				if err != nil {
-					log.Fatal(err)
+				model := Model{Name: m.Name, Directive: dire, Struct: m}
+				switch dire {
+				case setting.DirectiveGen:
+					// gen direction
+					gs, err := Setting.ParseDirectiveGen(doc)
+					if err != nil {
+						log.Fatal(err)
+					}
+					// default names
+					if gs.Repository == "" {
+						gs.Repository = m.Name + RepositoryName
+					}
+					if gs.Service == "" {
+						gs.ServiceInterface = m.Name + ServiceName
+						gs.Service = pkg.LowerFirst(m.Name) + ServiceName
+					}
+					if gs.Controller == "" {
+						gs.Controller = m.Name + ControllerName
+					}
+					model.Gen = *gs
+				case setting.DirectiveSync:
+					// other direction
 				}
-				// default names
-				if gs.Repository == "" {
-					gs.Repository = m.Name + RepositoryName
-				}
-				if gs.Service == "" {
-					gs.ServiceInterface = m.Name + ServiceName
-					gs.Service = pkg.LowerFirst(m.Name) + ServiceName
-				}
-				if gs.Controller == "" {
-					gs.Controller = m.Name + ControllerName
-				}
-				// other direction
-				model := Model{Name: m.Name, Directive: dire, Gen: *gs, Struct: m}
 				models = append(models, &model)
-				info(c, "found gen.model=%v, repository=%v, service=%v:%v, controller=%v\n", model.Name, model.Gen.Repository, model.Gen.Service, model.Gen.ServiceInterface, model.Gen.Controller)
+				info(c, "found gen.model=%v, directive=%v, repository=%v, service=%v:%v, controller=%v\n", model.Name, model.Directive, model.Gen.Repository, model.Gen.Service, model.Gen.ServiceInterface, model.Gen.Controller)
 			}
 		}
 	}
