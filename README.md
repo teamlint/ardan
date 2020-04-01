@@ -32,7 +32,7 @@ go install
 mkdir myproject
 cd myproject
 go mod init <name>
-ardan -s init  
+ardan -s -dc <db-conn> init  
 ```
 #### Project layout
 
@@ -42,8 +42,11 @@ ardan -s init
 
 ```shell
 task run
-// or
-go run cmd/server/main.go
+```
+OR
+```shell
+cd cmd/server
+go run main.go
 ```
 
 ### Model Sync
@@ -60,7 +63,7 @@ import (
 )
 
 //ardan:sync
-//ardan:gen --service TomService --repository 
+//ardan:gen -all 
 // Tom test model
 type Tom struct{
 	ID         string     `xorm:"not null pk unique CHAR(20) 'id'" json:"id"`
@@ -69,7 +72,7 @@ type Tom struct{
 }
 ```
 ```shell
-ardan -dc <databae-conn-str> sync 
+ardan -dc <db-conn> sync 
 ```
 
 #### view database
