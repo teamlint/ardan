@@ -25,13 +25,13 @@ tasks:
     desc: "model sync"
     cmds:
       - echo "model sync"
-      - ardan -dc "postgres://postgres:123456@localhost:5432/ardan?sslmode=disable" sync
+      - ardan sync
     silent: true
  
   gen:
     desc: "ardan gen"
     cmds:
-      - echo "ardan.gen repository/service/controller"
+      - echo "ardan.gen repository|service|controller"
       - ardan gen
     silent: true
  

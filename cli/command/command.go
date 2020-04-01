@@ -38,7 +38,7 @@ var (
 	once             sync.Once
 	Setting          *setting.Setting
 	ErrGoModNone     = errors.New("please use `go mod init` or use `--mod` global options\n")
-	ErrDBConnStrNone = errors.New("please use `--db-conn` global options setting database connection string\n")
+	ErrDBConnStrNone = errors.New("please use `--db-conn` options or `config.yml` file setting database connection string\n")
 )
 
 func Setup(c *cli.Context) error {

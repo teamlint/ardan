@@ -2,7 +2,6 @@ package config
 
 import (
 	"log"
-	"os"
 
 	"github.com/micro/go-micro/config"
 	"github.com/micro/go-micro/config/reader"
@@ -10,6 +9,7 @@ import (
 	"github.com/micro/go-micro/config/source/env"
 	"github.com/micro/go-micro/config/source/file"
 	"github.com/teamlint/ardan/config/section"
+	"github.com/teamlint/ardan/pkg"
 )
 
 var (
@@ -17,15 +17,15 @@ var (
 )
 
 const (
-	CONFIG_FILE                  = "./config.yml"
-	DEFAULT_TITLE                = "teamlint"
-	DEFAULT_COPYRIGHT            = "teamlint.com"
-	DEFAULT_TIMEFORMAT           = "2006-01-02 15:04:05"
-	DEFAULT_CHARSET              = "UTF-8"
-	DEFAULT_SERVER_HTTP_ADDR     = ":1234"
-	DEFAULT_SERVER_READ_TIMEOUT  = "5s"
-	DEFAULT_SERVER_WRITE_TIMEOUT = "10s"
-	DEFAULT_SERVER_IDLE_TIMEOUT  = "15s"
+	ConfigFile                = "./config.yml"
+	DefaultTitle              = "teamlint"
+	DefaultCopyright          = "teamlint.com"
+	DefaultTimeFormat         = "2006-01-02 15:04:05"
+	DefaultCharset            = "UTF-8"
+	DefaultServerHTTPAddr     = ":1234"
+	DefaultServerReadTimeout  = "5s"
+	DefaultServerWriteTimeout = "10s"
+	DefaultServerIdleTimeout  = "15s"
 )
 
 type Option func(conf *section.Config)
@@ -37,8 +37,8 @@ func init() {
 	}
 	defaultOption(conf)
 	sources := []source.Source{env.NewSource()}
-	if Exists(CONFIG_FILE) {
-		sources = append(sources, file.NewSource(file.WithPath(CONFIG_FILE)))
+	if pkg.Exists(ConfigFile) {
+		sources = append(sources, file.NewSource(file.WithPath(ConfigFile)))
 	}
 	err := config.Load(sources...)
 	if err != nil {
@@ -46,13 +46,14 @@ func init() {
 	}
 }
 
-// Exists 判断指定文件/目录是否存在
-func Exists(path string) bool {
-	_, err := os.Stat(path)
-	if err != nil {
-		return os.IsExist(err)
-	}
-	return true
+// LoadFile 加载配置文件
+func LoadFile(path string) error {
+	return config.LoadFile(path)
+}
+
+// Load config sources
+func Load(source ...source.Source) error {
+	return config.Load(source...)
 }
 
 // Config 配置
@@ -110,34 +111,34 @@ func defaultOption(conf *section.Config) {
 	// App
 	conf.App.Debug = true
 	if conf.App.Title == "" {
-		conf.App.Title = DEFAULT_TITLE
+		conf.App.Title = DefaultTitle
 	}
 	if conf.App.Copyright == "" {
-		conf.App.Copyright = DEFAULT_COPYRIGHT
+		conf.App.Copyright = DefaultCopyright
 	}
 	if conf.App.TimeFormat == "" {
-		conf.App.TimeFormat = DEFAULT_TIMEFORMAT
+		conf.App.TimeFormat = DefaultTimeFormat
 	}
 	if conf.App.Charset == "" {
-		conf.App.Charset = DEFAULT_CHARSET
+		conf.App.Charset = DefaultCharset
 	}
 	// Server
 	if conf.Server.HttpAddr == "" {
-		conf.Server.HttpAddr = DEFAULT_SERVER_HTTP_ADDR
+		conf.Server.HttpAddr = DefaultServerHTTPAddr
 	}
 	if conf.Server.ReadTimeout == "" {
-		conf.Server.ReadTimeout = DEFAULT_SERVER_READ_TIMEOUT
+		conf.Server.ReadTimeout = DefaultServerReadTimeout
 	}
 	if conf.Server.WriteTimeout == "" {
-		conf.Server.WriteTimeout = DEFAULT_SERVER_WRITE_TIMEOUT
+		conf.Server.WriteTimeout = DefaultServerWriteTimeout
 	}
 	if conf.Server.IdleTimeout == "" {
-		conf.Server.IdleTimeout = DEFAULT_SERVER_IDLE_TIMEOUT
+		conf.Server.IdleTimeout = DefaultServerIdleTimeout
 	}
 }
 
-// Http服务地址
-func WithHttpAddr(addr string) Option {
+// WithHTTPAddr Http服务地址
+func WithHTTPAddr(addr string) Option {
 	return func(conf *section.Config) {
 		conf.Server.HttpAddr = addr
 	}

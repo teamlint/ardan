@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/teamlint/ardan/cli/setting"
+	"github.com/teamlint/ardan/config"
 	"github.com/teamlint/ardan/pkg"
 	"github.com/urfave/cli/v2"
 )
@@ -36,7 +37,21 @@ var SyncToDB = &cli.Command{
 
 func syncToDB(c *cli.Context) error {
 	if Setting.DBConnStr == "" {
-		return ErrDBConnStrNone
+		// read config.yml
+		configFile := filepath.Join(Setting.Output, Setting.Cmd, Setting.Server, setting.ConfigFile)
+		if pkg.Exists(configFile) {
+			if err := config.LoadFile(configFile); err != nil {
+				return fmt.Errorf("read config file err=%v\n", err)
+			}
+			connStr := config.Get("Databases", Setting.DBName, "ConnString").String("")
+			if connStr == "" {
+				return ErrDBConnStrNone
+			}
+			Setting.DBConnStr = connStr
+			info(c, "found `db-conn` in %v [%v] section\n", configFile, fmt.Sprintf("Databases.%s.ConnString", Setting.DBName))
+		} else {
+			return ErrDBConnStrNone
+		}
 	}
 	info(c, "db-conn = %v\n", Setting.DBConnStr)
 	// gen main.go

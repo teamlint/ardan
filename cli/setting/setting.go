@@ -39,6 +39,7 @@ const (
 	GoMainFileTmpl = "main.go.tmpl"
 	GoMainFile     = "main.go"
 	GoFileSuffix   = ".go"
+	ConfigFile     = "config.yml"
 	// Iteration
 	IterationFileTmpl = "iteration"
 	// template
