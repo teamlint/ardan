@@ -39,7 +39,7 @@ tasks:
     desc: "release"
     cmds:
       - echo "release generating..."
-      - GOOS=linux go build -ldflags '-w -s' -o ./release/{{.Product}} ./cmd/server/main.go
+      - GOOS=linux go build -ldflags "-w -s" -o ./release/{{.Product}} ./cmd/server/main.go
       - echo "release generated."
     silent: true
 

@@ -24,7 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	sync(db)
+	err = sync(db)
 	if err != nil {
 		log.Fatal(err)
 	}

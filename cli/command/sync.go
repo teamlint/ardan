@@ -78,7 +78,7 @@ func genMainfile(c *cli.Context) error {
 	// go run
 	output, err := GoRun(filepath.Dir(target), setting.GoMainFile)
 	if err != nil {
-		return fmt.Errorf("sync.GoRun err=%v\n", err)
+		return err
 	}
 	info(c, "--------------------- [sync] start ----------------------------\n"+output)
 	pkg.DeleteFile(target, true)

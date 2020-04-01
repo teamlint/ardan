@@ -84,19 +84,18 @@ func GoBuild(dir string, source string, name string) error {
 
 func GoRun(dir string, main string) (string, error) {
 	cmd := execute.ExecTask{
-		Command: "go",
-		// Args:         []string{"run", "-ldflags", `"-w -s"`, "-o", name, source},
+		Command:      "go",
 		Args:         []string{"run", main},
 		PrintCommand: false, // print command
 		Cwd:          dir,
-		// - GOOS=linux go build -ldflags '-w -s' -o ./release/{{.Product}} ./cmd/server/main.go
+		StreamStdio:  true,
 	}
 	result, err := cmd.Execute()
 	if err != nil {
 		return "", fmt.Errorf("GoRun err=%v\n", err)
 	}
 	if result.ExitCode != 0 {
-		return "", fmt.Errorf("GoRun err=%v, ExitCode=%v\n", err, result.ExitCode)
+		return "", fmt.Errorf("GoRun err=%v, ExitCode=%v\n", result.Stderr, result.ExitCode)
 	}
 	return result.Stdout, nil
 
