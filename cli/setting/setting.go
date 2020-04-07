@@ -8,8 +8,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/rakyll/statik/fs"
 	"github.com/teamlint/ardan/pkg"
@@ -257,9 +259,14 @@ func defaultFuncMap() template.FuncMap {
 	fm["import"] = importPath
 	fm["randomString"] = pkg.RandomString
 	fm["lower"] = pkg.Lower
+	fm["year"] = year
 	return fm
 }
 
+// Year get current year
+func year() string {
+	return strconv.Itoa(time.Now().Year())
+}
 func clean(path string) string {
 	path = strings.TrimPrefix(path, ".")
 	path = strings.TrimPrefix(path, "/")

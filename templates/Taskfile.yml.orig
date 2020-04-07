@@ -2,6 +2,8 @@
 
 version: '2'
 
+output: prefixed
+
 vars:
   Product: 'ardan'
 
@@ -9,7 +11,7 @@ tasks:
   default:
     desc: "default task"
     cmds:
-      - echo "{{.Product}}"
+      - echo "[Project] {{.Product}}"
       - task: run
     silent: true
 
@@ -17,7 +19,9 @@ tasks:
     desc: "go run server"
     dir: cmd/server/
     cmds:
-      - echo "server run "
+      - echo " ---------------------------------------------------------"
+      - echo " -    server running at http://localhost:1234            -"
+      - echo " ---------------------------------------------------------"
       - go run main.go
     silent: true
 
