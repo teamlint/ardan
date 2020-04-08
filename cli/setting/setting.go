@@ -271,6 +271,8 @@ func clean(path string) string {
 	path = strings.TrimPrefix(path, ".")
 	path = strings.TrimPrefix(path, "/")
 	path = strings.TrimSuffix(path, "/")
+	// fix windows path
+	path = strings.TrimSuffix(path, "\\")
 	return path
 }
 
