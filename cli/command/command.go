@@ -164,7 +164,7 @@ func ParseModelFiles(c *cli.Context, directive setting.Directive) ([]*Model, err
 		if fi.IsDir() {
 			return nil
 		}
-		// info(c, "\tParseModelFiles path=%v\n", path)
+		info(c, "\tParseModelFiles path=%v\n", path)
 		tf, err := astra.ParseFile(path)
 		if err != nil {
 			return fmt.Errorf("ParseModelFiles err=%v\n", err)
