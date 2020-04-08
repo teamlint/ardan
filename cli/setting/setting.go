@@ -320,7 +320,7 @@ func (s *Setting) SourceFile(srcname string) string {
 func (s *Setting) TmplFile(path ...string) string {
 	root := []string{"/"}
 	root = append(root, path...)
-	return filepath.Join(root...)
+	return filepath.ToSlash(filepath.Join(root...))
 }
 
 func (s *Setting) HasPrefix(path, layout string) bool {
