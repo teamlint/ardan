@@ -109,7 +109,7 @@ func (c *DemoController) List(ctx *gin.Context) {
 		query.Base
 		query.Demo
 	}{}
-	if err = ctx.ShouldBindJSON(&params); err != nil {
+	if err = ctx.ShouldBind(&params); err != nil {
 		log.Err(err).Str("controller","DemoController").Str("method","List").Msg("cannot bind params")
 		ctx.JSON(http.StatusBadRequest, api.NewResponseError("参数解析失败"))
 		return
