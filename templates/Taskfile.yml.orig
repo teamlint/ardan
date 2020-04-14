@@ -1,4 +1,4 @@
-# https://taskfile.dev
+
 
 version: '2'
 
@@ -43,7 +43,17 @@ tasks:
     desc: "release"
     cmds:
       - echo "release generating..."
-      - GOOS=linux go build -ldflags "-w -s" -o ./release/{{.Product}} ./cmd/server/main.go
-      - echo "release generated."
+      - GOOS=linux go build -ldflags "-w -s" -o ./release/{{.Product}}_{{.GitCommit}} ./cmd/server/main.go
+      - echo "release {{.Product}}_{{.GitCommit}}."
+    vars:
+      GitCommit:
+        sh: git describe --always --tags --dirty
+    silent: true
+
+  version:
+    desc: "version"
+    cmds:
+      - echo "current version:"
+      - git describe --always --tags --dirty
     silent: true
 

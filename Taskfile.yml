@@ -9,6 +9,7 @@ tasks:
   default:
     cmds:
       - echo "{{.Product}}"
+      - task: run
     desc: default task
     silent: true
   
@@ -32,6 +33,17 @@ tasks:
     deps: [res]
     cmds:
       - echo "release generating..."
-      - go build -ldflags '-w -s' -o ./release/{{.Product}} ./main.go
-      - echo "release generated."
+      - go build -ldflags "-w -s" -o ./release/{{.Product}}_{{.GitCommit}} ./main.go
+      - echo "release {{.Product}}_{{.GitCommit}}."
+    vars:
+      GitCommit:
+        sh: git describe --always --tags --dirty
     silent: true
+
+  version:
+    desc: "version"
+    cmds:
+      - echo "current version:"
+      - git describe --always --tags --dirty
+    silent: true
+
