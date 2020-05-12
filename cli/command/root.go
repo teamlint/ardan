@@ -16,7 +16,7 @@ func Run() error {
 		Authors:      []*cli.Author{&cli.Author{Name: "venjiang", Email: "venjiang@gmail.com"}},
 		Copyright:    "Copyright teamlint.com",
 		Usage:        "make an app bootstrap",
-		Version:      "v1.0.0",
+		Version:      "v0.2.6",
 		Flags:        flags(),
 		BashComplete: bashComplete,
 		Before:       before,
