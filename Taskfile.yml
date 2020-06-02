@@ -33,7 +33,7 @@ tasks:
     deps: [res]
     cmds:
       - echo "release generating..."
-      - go build -ldflags "-w -s" -o ./release/{{.Product}}_{{.GitCommit}} ./main.go
+      - go build -ldflags "-w -s -X github.com/teamlint/ardan/version.Version={{.GitCommit}}" -o ./release/{{.Product}}_{{.GitCommit}} ./main.go
       - echo "release {{.Product}}_{{.GitCommit}}."
     vars:
       GitCommit:

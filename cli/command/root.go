@@ -4,10 +4,13 @@ import (
 	"os"
 
 	"github.com/teamlint/ardan/cli/setting"
+	"github.com/teamlint/ardan/version"
 	"github.com/urfave/cli/v2"
 )
 
-var opts setting.Options
+var (
+	opts setting.Options
+)
 
 // Run command run
 func Run() error {
@@ -16,7 +19,7 @@ func Run() error {
 		Authors:      []*cli.Author{&cli.Author{Name: "venjiang", Email: "venjiang@gmail.com"}},
 		Copyright:    "Copyright teamlint.com",
 		Usage:        "make an app bootstrap",
-		Version:      "v0.2.6",
+		Version:      version.Version,
 		Flags:        flags(),
 		BashComplete: bashComplete,
 		Before:       before,
