@@ -50,7 +50,7 @@ func (s *{{$Svc}}) GetBy(query interface{}, args ...interface{}) (*{{.Setting.Mo
 }
 
 func (s *{{$Svc}}) List() ([]*{{.Setting.Model}}.{{.Model.Name}}, error) {
-	return s.repo.Find(nil, nil)
+	return s.repo.Find(nil)
 }
 
 func (s *{{$Svc}}) Paged(base *query.Base, q *query.{{.Model.Name}}) ([]*{{.Setting.Model}}.{{.Model.Name}}, int64, error) {

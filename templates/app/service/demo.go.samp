@@ -47,7 +47,7 @@ func (s *demoService) GetByUsername(name string) (*{{.Setting.Model}}.Demo, erro
 }
 
 func (s *demoService) List() ([]*{{.Setting.Model}}.Demo, error) {
-	return s.repo.Find(nil, nil)
+	return s.repo.Find(nil)
 }
 
 func (s *demoService) Paged(base *query.Base, q *query.Demo) ([]*{{.Setting.Model}}.Demo, int64, error) {

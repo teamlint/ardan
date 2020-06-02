@@ -101,7 +101,6 @@ func (r *DemoRepository) Paged(sess *xorm.Session, base *query.Base, opts ...Ses
 	if sess == nil {
 		sess = r.NewSession()
 		defer sess.Close()
-		sess = sess.OrderBy("id desc")
 	}
 	// query
 	sess = base.Options(sess)
