@@ -10,7 +10,7 @@ tasks:
     cmds:
       - echo "{{.Product}}"
       - task: run
-    desc: default task
+    desc: default task(run)
     silent: true
   
   run:
@@ -45,5 +45,17 @@ tasks:
     cmds:
       - echo "current version:"
       - git describe --always --tags --dirty
+    silent: true
+
+  install:
+    desc: "install"
+    deps: [res]
+    cmds:
+      - echo "{{.Product}} install..."
+      - go install -ldflags "-w -s -X github.com/teamlint/ardan/version.Version={{.GitCommit}}" 
+      - echo "{{.Product}} {{.GitCommit}} is installed."
+    vars:
+      GitCommit:
+        sh: git describe --always --tags --dirty
     silent: true
 
