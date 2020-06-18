@@ -32,6 +32,7 @@ func NewHomeController() *HomeController {
 // server module register interface
 func (c *HomeController) RegisterModule(s *server.Server) {
 	s.GET("/", c.Index)
+	s.GET("/_health", c.Health)
 }
 
 func (c *HomeController) Index(ctx *gin.Context) {
@@ -42,4 +43,8 @@ func (c *HomeController) Index(ctx *gin.Context) {
 		"CreatedAt": time.Now(),
 	}
 	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", result))
+}
+
+func (c *HomeController) Health(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
