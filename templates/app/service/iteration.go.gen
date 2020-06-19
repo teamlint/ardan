@@ -46,7 +46,7 @@ func (s *{{$Svc}}) Get(id string) (*{{.Setting.Model}}.{{.Model.Name}}, error) {
 }
 
 func (s *{{$Svc}}) GetBy(query interface{}, args ...interface{}) (*{{.Setting.Model}}.{{.Model.Name}}, error) {
-	return s.repo.GetBy(nil, query, args)
+	return s.repo.GetBy(nil, query, args...)
 }
 
 func (s *{{$Svc}}) List() ([]*{{.Setting.Model}}.{{.Model.Name}}, error) {
