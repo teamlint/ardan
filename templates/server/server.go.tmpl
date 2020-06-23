@@ -4,6 +4,7 @@
 package {{.Setting.Server}}
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -21,8 +22,22 @@ import (
 	"github.com/teamlint/ardan/server"
 )
 
+var (
+	cfg = flag.String("config", "", "load config file")
+)
+
 // Start use teamlint container
 func Start() {
+	flag.Parse()
+	// config
+	if *cfg != "" {
+		log.Printf("[ardan] config file is used: %v\n", *cfg)
+		if err := config.LoadFile(*cfg); err != nil {
+			panic(err)
+		}
+	}
+	conf := config.Config()
+	// container
 	container.Build(
 		// db
 		container.Provide({{.Setting.Repository}}.NewDB),
@@ -53,13 +68,10 @@ func Start() {
 		// with modules server
 		container.Provide(server.NewWithModules),
 	)
+	// http server
 	var srv *server.Server
 	container.MustExtract(&srv)
-
-	// http server
-	conf := config.Config()
 	s := srv.HttpServer(conf)
-
 	// greaceful shutdown
 	done := make(chan struct{}, 1)
 	quit := make(chan os.Signal, 1)
