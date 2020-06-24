@@ -9,7 +9,7 @@ require (
 	github.com/alexellis/go-execute v0.0.0-20200124154445-8697e4e28c5e
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
-	github.com/gin-gonic/gin v1.5.0
+	github.com/gin-gonic/gin v1.6.3
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/go-task/task v2.2.0+incompatible
 	github.com/golang/snappy v0.0.1 // indirect
@@ -26,5 +26,5 @@ require (
 	go.uber.org/dig v1.8.0
 	golang.org/x/tools v0.0.0-20191030062658-86caa796c7ab
 	mvdan.cc/sh v2.6.4+incompatible // indirect
-	xorm.io/xorm v1.0.1
+	xorm.io/xorm v1.0.2
 )

@@ -9,68 +9,45 @@ import (
 
 // Gen sync database tabels struct
 var Gen = &cli.Command{
-	Name:    "gen",
-	Aliases: []string{"generate"},
+	Name:    "generate",
+	Aliases: []string{"gen", "g"},
 	Usage:   "generate source codes",
 	Action: func(c *cli.Context) error {
 		var err error
-		err = gen(c)
+		err = genAll(c)
 		if err != nil {
 			return err
 		}
 		return nil
 	},
-	// Subcommands: []*cli.Command{
-	// 	GenController,
-	// },
+	Subcommands: []*cli.Command{
+		GenQuery,
+		GenRepository,
+		GenService,
+		GenController,
+	},
 }
 
-func gen(c *cli.Context) error {
-	if err := genModelFile(c); err != nil {
+func genAll(c *cli.Context) error {
+	if err := genModelFile(c, setting.GenTypeAll); err != nil {
 		return err
 	}
-	// run main
-	// info(c, ">> %v\n", "generated")
 
 	return nil
 }
 
-func genModelFile(c *cli.Context) error {
+func genModelFile(c *cli.Context, genType setting.GenType) error {
 	models, err := ParseModelFiles(c, setting.DirectiveGen)
 	if err != nil {
 		return err
 	}
-	// repository
-
-	// service
-	// controller
 	for _, name := range Setting.Gens {
 		if Setting.IsIteration(name) {
 			// iteration
 			for _, model := range models {
-				// 获取指令参数
-				// gs, err := Setting.ParseDirectiveGen(model.Directive)
-				// if err != nil {
-				// 	return err
-				// }
-				// info(c, "direc=%v, all=%v, repository=%v, service=%v, controller=%v\n", gs.Directive, gs.All, gs.Repository, gs.Service, gs.Controller)
-				if err := genFile(c, name, model); err != nil {
+				if err := genFile(c, name, model, genType); err != nil {
 					return err
 				}
-				// genRepositoryFiel(c, model)
-				// target := Setting.TargetFile(name)
-				// err = Render(target, name, map[string]interface{}{"Models": beans})
-				// if err != nil {
-				// 	return fmt.Errorf("sync.Render err=%v\n", err)
-				// }
-				// // go run
-				// output, err := GoRun(filepath.Dir(target), setting.GoMainFile)
-				// if err != nil {
-				// 	return fmt.Errorf("sync.GoRun err=%v\n", err)
-				// }
-				// info(c, "--------------------- [sync] start ----------------------------\n"+output)
-				// pkg.DeleteFile(target, true)
-				// info(c, "---------------------- [sync] end -----------------------------\n")
 			}
 		} else {
 			// single
@@ -86,18 +63,38 @@ func genModelFile(c *cli.Context) error {
 
 	return nil
 }
-func genFile(c *cli.Context, name string, model *Model) error {
-	// name := Setting.TmplFile(Setting.App, Setting.Repository, setting.IterationFileTmpl)
-	// tfile := filepath.Join(Setting.App, Setting.Repository, strings.ToLower(model.Name)+".go")
-	// target := Setting.TargetFile(name)
-	target := Setting.TargetFile(name, model.Name)
-	// info(c, "gen.repository directive=%v, tmpl=%v, target=%v\n", model.Directive, name, target)
-	// query
-	// todo
-	// repository, service, controller
+func genFile(c *cli.Context, name string, model *Model, genType setting.GenType) error {
+	var target string
+	// info(c, "gen.%s tmpl=%s\n", genType, name)
+	switch genType {
+	case setting.GenTypeQuery: // query
+		if !Setting.IsQuery(name) {
+			return nil
+		}
+	case setting.GenTypeRepository: // repository
+		if !Setting.IsRepository(name) {
+			return nil
+		}
+	case setting.GenTypeService: // service
+
+		if !Setting.IsService(name) {
+			return nil
+		}
+	case setting.GenTypeController: // controller
+
+		if !Setting.IsController(name) {
+			return nil
+		}
+	case setting.GenTypeAll: // all
+	default:
+		info(c, "not found <ardan:gen> directive\n")
+		return nil
+	}
+	target = Setting.TargetFile(name, setting.SnakeCase(model.Name))
+	// info(c, "gen %s tmpl=%s, target=%s\n", genType, name, target)
 	err := Render(target, name, map[string]interface{}{"Model": model})
 	if err != nil {
-		return fmt.Errorf("ardan.gen %v err=%v\n", target, err)
+		return fmt.Errorf("gen %s %v err=%v", genType, target, err)
 	}
 	info(c, ">> %v\n", target)
 	return nil

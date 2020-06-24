@@ -7,14 +7,14 @@ import (
 	"xorm.io/xorm"
 )
 
-// Demo demo model query
-type Demo struct {
+// DemoUser demo model query
+type DemoUser struct {
 	Username   string `json:"username"`
 	IsApproved bool   `json:"is_approved"`
 }
 
 // Options 查询参数
-func (q *Demo) Options(sess *xorm.Session) *xorm.Session {
+func (q *DemoUser) Options(sess *xorm.Session) *xorm.Session {
 	if q == nil {
 		return sess
 	}

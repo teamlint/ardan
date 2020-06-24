@@ -6,7 +6,7 @@ import (
 
 // InitDoc init document directory
 var InitDoc = &cli.Command{
-	Name:   "cmd",
+	Name:   "doc",
 	Usage:  "initial document directory",
 	Action: initDocCode,
 }

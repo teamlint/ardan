@@ -17,27 +17,27 @@ import (
 	"github.com/teamlint/ardan/server"
 )
 
-type DemoController struct{
-	DemoService     {{.Setting.Service}}.DemoService
+type DemoUserController struct{
+	DemoUserService     {{.Setting.Service}}.DemoUserService
 
 }
 
-func NewDemoController(svc {{.Setting.Service}}.DemoService) *DemoController {
-	return &DemoController{
-		DemoService: svc,
+func NewDemoUserController(svc {{.Setting.Service}}.DemoUserService) *DemoUserController {
+	return &DemoUserController{
+		DemoUserService: svc,
 	}
 }
 
 // server module register interface
-func (c *DemoController) RegisterModule(s *server.Server) {
-	g := s.Group("/demo")
+func (c *DemoUserController) RegisterModule(s *server.Server) {
+	g := s.Group("/demo-user")
 	g.POST("/add", c.Add)
 	g.POST("/save", c.Save)
 	g.POST("/list", c.List)
 	g.GET("/info/:id", c.Info)
 }
 
-func (c *DemoController) Add(ctx *gin.Context) {
+func (c *DemoUserController) Add(ctx *gin.Context) {
 	var err error
 	params := struct {
 		ID 				string 				 `json:"id" form:"id"`
@@ -50,21 +50,21 @@ func (c *DemoController) Add(ctx *gin.Context) {
 		Posts      		int64                `json:"posts" form:"posts"`
 	}{}
 	if err = ctx.ShouldBind(&params); err != nil {
-		log.Err(err).Str("controller","DemoController").Str("method","Add").Msg("cannot bind params")
+		log.Err(err).Str("controller","DemoUserController").Str("method","Add").Msg("cannot bind params")
 		ctx.JSON(http.StatusOK, api.NewResponseError("参数解析失败"))
 		return
 	}
-	var item {{.Setting.Model}}.Demo
+	var item {{.Setting.Model}}.DemoUser
 	if err = copier.Copy(&item, &params); err!=nil{
-		log.Err(err).Str("controller","DemoController").Str("method","Add").Msg("cannot copy params")
+		log.Err(err).Str("controller","DemoUserController").Str("method","Add").Msg("cannot copy params")
 		ctx.JSON(http.StatusOK, api.NewResponseError("参数转换失败"))
 		return
 	}
 	if item.ID == "" {
 		item.ID = {{.Setting.Model}}.NewID()
 	}
-	if err = c.DemoService.Add(&item); err != nil {
-		log.Err(err).Str("controller","DemoController").Str("method","Add").Msg("cannot load service")
+	if err = c.DemoUserService.Add(&item); err != nil {
+		log.Err(err).Str("controller","DemoUserController").Str("method","Add").Msg("cannot load service")
 		ctx.JSON(http.StatusOK, api.NewResponseError("添加信息失败"))
 		return
 	}
@@ -72,7 +72,7 @@ func (c *DemoController) Add(ctx *gin.Context) {
 }
 
 
-func (c *DemoController) Save(ctx *gin.Context) {
+func (c *DemoUserController) Save(ctx *gin.Context) {
 	var err error
 	params := struct {
 		ID 				string 				 `json:"id" form:"id"`
@@ -85,40 +85,40 @@ func (c *DemoController) Save(ctx *gin.Context) {
 		Posts      		int64                `json:"posts" form:"posts"`
 	}{}
 	if err = ctx.ShouldBind(&params); err != nil {
-		log.Err(err).Str("controller","DemoController").Str("method","Save").Msg("cannot bind params")
+		log.Err(err).Str("controller","DemoUserController").Str("method","Save").Msg("cannot bind params")
 		ctx.JSON(http.StatusOK, api.NewResponseError("参数解析失败"))
 		return
 	}
-	var item {{.Setting.Model}}.Demo
+	var item {{.Setting.Model}}.DemoUser
 	if err = copier.Copy(&item, &params); err!=nil{
-		log.Err(err).Str("controller","DemoController").Str("method","Save").Msg("cannot copy params")
+		log.Err(err).Str("controller","DemoUserController").Str("method","Save").Msg("cannot copy params")
 		ctx.JSON(http.StatusOK, api.NewResponseError("参数转换失败"))
 		return
 	}
-	if err = c.DemoService.Save(&item); err != nil {
-		log.Err(err).Str("controller","DemoController").Str("method","Save").Msg("cannot load service")
+	if err = c.DemoUserService.Save(&item); err != nil {
+		log.Err(err).Str("controller","DemoUserController").Str("method","Save").Msg("cannot load service")
 		ctx.JSON(http.StatusOK, api.NewResponseError("保存信息失败"))
 		return
 	}
 	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", item.ID))
 }
 
-func (c *DemoController) List(ctx *gin.Context) {
+func (c *DemoUserController) List(ctx *gin.Context) {
 	var err error
 	params := struct {
 		query.Base
-		query.Demo
+		query.DemoUser
 	}{}
 	if err = ctx.ShouldBind(&params); err != nil {
-		log.Err(err).Str("controller","DemoController").Str("method","List").Msg("cannot bind params")
+		log.Err(err).Str("controller","DemoUserController").Str("method","List").Msg("cannot bind params")
 		ctx.JSON(http.StatusOK, api.NewResponseError("参数解析失败"))
 		return
 	}
 	var totals int64
-	var items []*{{.Setting.Model}}.Demo
-	items, totals, err = c.DemoService.Paged(&params.Base, &params.Demo)
+	var items []*{{.Setting.Model}}.DemoUser
+	items, totals, err = c.DemoUserService.Paged(&params.Base, &params.DemoUser)
 	if err != nil {
-		log.Err(err).Str("controller","DemoController").Str("method","List").Msg("cannot load service")
+		log.Err(err).Str("controller","DemoUserController").Str("method","List").Msg("cannot load service")
 		ctx.JSON(http.StatusOK, api.NewResponseError("获取资源列表信息失败"))
 		return
 	}
@@ -128,13 +128,13 @@ func (c *DemoController) List(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", result))
 }
-func (c *DemoController) Info(ctx *gin.Context) {
-	var result *{{.Setting.Model}}.Demo
+func (c *DemoUserController) Info(ctx *gin.Context) {
+	var result *{{.Setting.Model}}.DemoUser
 	var err error
 	id := ctx.Param("id")
-	result, err = c.DemoService.Get(id)
+	result, err = c.DemoUserService.Get(id)
 	if err != nil {
-		log.Err(err).Str("controller","DemoController").Str("method","Info").Msg("cannot load service")
+		log.Err(err).Str("controller","DemoUserController").Str("method","Info").Msg("cannot load service")
 		ctx.JSON(http.StatusOK, api.NewResponseError("获取资源信息失败"))
 		return
 	}

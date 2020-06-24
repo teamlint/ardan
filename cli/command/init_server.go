@@ -6,8 +6,8 @@ import (
 
 // InitServer init server layer layout
 var InitServer = &cli.Command{
-	Name:    "s",
-	Aliases: []string{"server"},
+	Name:    "server",
+	Aliases: []string{"s"},
 	Usage:   "initial server layer layout",
 	Action:  initServerCode,
 }

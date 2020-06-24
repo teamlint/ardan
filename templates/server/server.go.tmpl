@@ -42,27 +42,27 @@ func Start() {
 		// db
 		container.Provide({{.Setting.Repository}}.NewDB),
 		// repositories
-		{{if .Setting.Sample}}
-		container.Provide({{.Setting.Repository}}.NewDemoRepository),
+		{{- if .Setting.Sample}}
+		container.Provide({{.Setting.Repository}}.NewDemoUserRepository),
 		{{end}}
 		// services
-		{{if .Setting.Sample}}
-		container.Provide({{.Setting.Service}}.NewDemoService),
+		{{- if .Setting.Sample}}
+		container.Provide({{.Setting.Service}}.NewDemoUserService),
 		{{end}}
 		// modules
 		container.Provide({{.Setting.ServerModule}}.NewCORS, container.As(new(server.Module))),
 		container.Provide({{.Setting.ServerModule}}.NewLogger, container.As(new(server.Module))),
-		{{if .Setting.Sample}}
+		{{- if .Setting.Sample}}
 		container.Provide({{.Setting.ServerModule}}.NewSync, container.As(new(server.Module))),
 		{{end}}
 		// middlewares
-		{{if .Setting.Sample}}
+		{{- if .Setting.Sample}}
 		container.Provide({{.Setting.Middleware}}.NewDemo, container.As(new(server.Module))),
 		{{end}}
 		// controllers
 		container.Provide({{.Setting.Controller}}.NewHomeController, container.As(new(server.Module))),
-		{{if .Setting.Sample}}
-		container.Provide({{.Setting.Controller}}.NewDemoController, container.As(new(server.Module))),
+		{{- if .Setting.Sample}}
+		container.Provide({{.Setting.Controller}}.NewDemoUserController, container.As(new(server.Module))),
 		{{end}}
 
 		// with modules server

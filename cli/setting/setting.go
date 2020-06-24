@@ -16,6 +16,7 @@ import (
 	"github.com/rakyll/statik/fs"
 	"github.com/teamlint/ardan/pkg"
 	_ "github.com/teamlint/ardan/res"
+	"xorm.io/xorm/names"
 )
 
 var (
@@ -52,9 +53,21 @@ const (
 	DirectiveGen  Directive = "ardan:gen"
 )
 
+// GenType generate code type
+type GenType uint8
+
+//go:generate stringer -type GenType -linecomment -output gen_type.go
+const (
+	GenTypeAll              GenType = iota // all
+	GenTypeQuery                           // query
+	GenTypeRepository                      // repository
+	GenTypeServiceInterface                // service interface
+	GenTypeService                         // service
+	GenTypeController                      // controller
+)
+
 type GenSet struct {
 	// Directive  string
-	All              bool
 	Repository       string
 	ServiceInterface string
 	Service          string
@@ -260,7 +273,17 @@ func defaultFuncMap() template.FuncMap {
 	fm["randomString"] = pkg.RandomString
 	fm["lower"] = pkg.Lower
 	fm["year"] = year
+	fm["snakeCase"] = SnakeCase
+	fm["kebabCase"] = KebabCase
 	return fm
+}
+
+func SnakeCase(name string) string {
+	return names.GonicMapper{}.Obj2Table(name)
+}
+
+func KebabCase(name string) string {
+	return strings.Replace(SnakeCase(name), "_", "-", -1)
 }
 
 // Year get current year
@@ -338,19 +361,24 @@ func (s *Setting) IsIteration(path string) bool {
 	return strings.HasPrefix(fname, IterationFileTmpl)
 }
 
-func (s *Setting) IsService(path string) bool {
-	layout := filepath.Join(s.App, s.Service)
-	return strings.HasPrefix(path, layout)
+func (s *Setting) IsQuery(path string) bool {
+	layout := filepath.Join(s.App, s.Model, s.Query)
+	return strings.HasPrefix(clean(path), layout)
 }
 
 func (s *Setting) IsRepository(path string) bool {
 	layout := filepath.Join(s.App, s.Repository)
-	return strings.HasPrefix(path, layout)
+	return strings.HasPrefix(clean(path), layout)
+}
+
+func (s *Setting) IsService(path string) bool {
+	layout := filepath.Join(s.App, s.Service)
+	return strings.HasPrefix(clean(path), layout)
 }
 
 func (s *Setting) IsController(path string) bool {
 	layout := filepath.Join(s.Server, s.Controller)
-	return strings.HasPrefix(path, layout)
+	return strings.HasPrefix(clean(path), layout)
 }
 
 func (s *Setting) ParseDirectiveGen(doc string) (*GenSet, error) {
@@ -362,10 +390,8 @@ func (s *Setting) ParseDirectiveGen(doc string) (*GenSet, error) {
 	args = strings.TrimSpace(args)
 
 	var repository, service, controller string
-	var all bool
 
 	fs := flag.NewFlagSet("gen", flag.ContinueOnError)
-	fs.BoolVar(&all, "all", false, "gen all")
 	fs.StringVar(&repository, "repository", "", "gen repository")
 	fs.StringVar(&service, "service", "", "gen service")
 	fs.StringVar(&controller, "controller", "", "gen controller")
@@ -375,7 +401,6 @@ func (s *Setting) ParseDirectiveGen(doc string) (*GenSet, error) {
 	}
 	return &GenSet{
 		// Directive:  direc,
-		All:              all,
 		Repository:       repository,
 		ServiceInterface: service,
 		Service:          pkg.LowerFirst(service),

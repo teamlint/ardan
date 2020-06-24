@@ -30,7 +30,7 @@ func (m *Sync) RegisterModule(srv *server.Server) {
 
 func sync(db *xorm.Engine) {
 	err := db.Sync2(
-		new({{.Setting.Model}}.Demo),
+		new({{.Setting.Model}}.DemoUser),
 	)
 	if err != nil {
 		log.Err(err).Msg("db sync err")

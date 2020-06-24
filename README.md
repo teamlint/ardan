@@ -22,7 +22,7 @@ go get github.com/teamlint/ardan
 ```shell
 git clone git@github.com:teamlint/ardan.git
 cd ardan
-go install
+go install # OR: task install
 ```
 
 ### Usages
@@ -63,7 +63,7 @@ import (
 )
 
 //ardan:sync
-//ardan:gen -all 
+//ardan:gen 
 // Tom test model
 type Tom struct{
 	ID         string     `xorm:"not null pk unique CHAR(20) 'id'" json:"id"`
@@ -83,11 +83,14 @@ have fun!.
 
 ### Generate Tools
 
+genrate model query/repository/service/controller codes.
+
+`ardan gen [query|repository|service|controller]`
+
 ```shell
 ardan gen 
 ```
 
 ## TODO
-
-- new command (controller/middleware/module...)
+- 非子命令不执行
 

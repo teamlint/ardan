@@ -8,9 +8,9 @@ import (
 )
 
 //ardan:sync
-// ardan:gen -all generate all(repository/service/controller)
-// ardan:gen -repository <repo> -service <svc> -controller <ctrl> generate custom
-type Demo struct {
+// ardan:gen use default name
+// ardan:gen -repository <repo> -service <svc> -controller <ctrl> generate custom name
+type DemoUser struct {
 	ID         string     `xorm:"not null pk unique CHAR(20) 'id'" json:"id"`
 	Username   string     `xorm:"not null index VARCHAR(100)" json:"username"`
 	Password   string     `xorm:"not null VARCHAR(100)" json:"password"`
@@ -26,8 +26,8 @@ type Demo struct {
 }
 
 // TableName return table name
-func (m Demo) TableName() string {
-	return "demo"
+func (m DemoUser) TableName() string {
+	return "demo_user"
 }
 
 //go:generate stringer -type Gender -linecomment -output demo_user_gender.go

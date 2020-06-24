@@ -167,14 +167,14 @@ func ParseModelFiles(c *cli.Context, directive setting.Directive) ([]*Model, err
 		// info(c, "\tParseModelFiles path=%v\n", path)
 		tf, err := astra.ParseFile(path)
 		if err != nil {
-			return fmt.Errorf("ParseModelFiles err=%v\n", err)
+			return fmt.Errorf("ParseModelFiles err=%v", err)
 		}
 		// info(c, "\tParseModelFiles ast=%+v\n", *tf)
 		beans = append(beans, parseModelDiretive(c, tf, directive)...)
 		return err
 	})
 	if err != nil {
-		return nil, fmt.Errorf("walk model err=%v\n", err)
+		return nil, fmt.Errorf("walk model err=%v", err)
 	}
 	info(c, "ParseModelFiles completed.\n")
 	return beans, nil
@@ -208,7 +208,7 @@ func parseModelDiretive(c *cli.Context, tf *types.File, directive setting.Direct
 					model.Gen = *gs
 					info(c, "found gen.model=%v, directive=%v, repository=%v, service=%v:%v, controller=%v\n", model.Name, model.Directive, model.Gen.Repository, model.Gen.Service, model.Gen.ServiceInterface, model.Gen.Controller)
 				case setting.DirectiveSync:
-					// other direction
+					// sync direction
 					info(c, "found sync.model=%v, directive=%v\n", model.Name, model.Directive)
 				}
 				models = append(models, &model)

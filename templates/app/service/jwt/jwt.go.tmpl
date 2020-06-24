@@ -17,7 +17,6 @@ func NewToken(userID string) *jwtlib.Token {
 	// claims
 	claims := jwtlib.MapClaims{
 		"id": userID,
-		// "type": loginType,
 	}
 	exp := config.Get("JWT", "Exp").String("72h")
 	dur, err := time.ParseDuration(exp)
@@ -35,4 +34,11 @@ func SignedString(token *jwtlib.Token) string {
 		return ""
 	}
 	return tokenString
+}
+
+// Secret 获取加密字符串
+func Secret(token *jwtlib.Token) (interface{}, error) {
+	secret := config.Get("JWT", "Secret").String("")
+	b := ([]byte(secret))
+	return b, nil
 }

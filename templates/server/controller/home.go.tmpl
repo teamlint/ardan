@@ -4,17 +4,17 @@
 package {{.Setting.Controller}}
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
-	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Model}}"
-	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Model .Setting.Query}}"
-	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Service}}"
-
-	"github.com/rs/zerolog/log"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	api "github.com/teamlint/ardan/pkg/http"
 	"github.com/teamlint/ardan/server"
+
+	"{{import .Setting.GoMod .Setting.Output .Setting.App .Setting.Service "jwt"}}"
+	"{{import .Setting.GoMod .Setting.Output .Setting.Server .Setting.Middleware}}"
 )
 
 type HomeController struct{
@@ -33,6 +33,12 @@ func NewHomeController() *HomeController {
 func (c *HomeController) RegisterModule(s *server.Server) {
 	s.GET("/", c.Index)
 	s.GET("/_health", c.Health)
+	s.POST("/auth", c.Auth)
+
+	// login required middleware
+	pri := s.Group("/private")
+	pri.Use(middleware.LoginRequired())
+	pri.GET("/", c.Private)
 }
 
 func (c *HomeController) Index(ctx *gin.Context) {
@@ -47,4 +53,47 @@ func (c *HomeController) Index(ctx *gin.Context) {
 
 func (c *HomeController) Health(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
+}
+
+func (c *HomeController) Auth(ctx *gin.Context) {
+	var err error
+	params := struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}{}
+	if err = ctx.ShouldBind(&params); err != nil {
+		log.Err(err).Str("controller", "HomeController").Str("method", "Auth").Msg("cannot bind params")
+		ctx.JSON(http.StatusOK, api.NewResponseError("参数解析失败"))
+		return
+	}
+	// validate user/password
+	if !(params.Username == "admin" && params.Password == "ardan") {
+		err = errors.New("invalid username or password")
+		log.Err(err).Str("controller", "HomeController").Str("method", "Auth").Msg("user validate")
+		ctx.JSON(http.StatusOK, api.NewResponseError(err))
+		return
+	}
+	// token
+	token := jwt.NewToken(params.Username)
+	tokenString := jwt.SignedString(token)
+	if tokenString == "" {
+		err = errors.New("generate token is empty")
+		log.Err(err).Str("controller", "HomeController").Str("method", "Auth").Msg("token")
+		ctx.JSON(http.StatusOK, api.NewResponseError(err))
+		return
+	}
+	// result
+	result := struct {
+		Token    string `json:"token"`
+		Username string `json:"username"`
+	}{
+		Token:    tokenString,
+		Username: params.Username,
+	}
+	ctx.JSON(http.StatusOK, api.NewResponseOK("login success", result))
+}
+
+func (c *HomeController) Private(ctx *gin.Context) {
+	loginID := ctx.GetString("login.id")
+	ctx.JSON(http.StatusOK, api.NewResponseOK("ok", gin.H{"login.id": loginID}))
 }

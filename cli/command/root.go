@@ -73,7 +73,7 @@ func flags() []cli.Flag {
 		&cli.StringFlag{
 			Name:        "db-conn",
 			Aliases:     []string{"dc"},
-			Usage:       "database connection string",
+			Usage:       "database connection string\n\t\te.g. postgres://postgres:123456@127.0.0.1:5432/ardan?sslmode=disable",
 			Destination: &opts.DBConnStr,
 		},
 		&cli.StringFlag{

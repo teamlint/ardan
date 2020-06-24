@@ -8,9 +8,9 @@ Content-Type: "application/json"
 --
 # end global scope.
 
-# /demo/add
+# /demo-user/add
 --
-POST /demo/add 
+POST /demo-user/add 
 
 {
     "id": "bpsshl3ipt306cb9n3f0",
@@ -22,9 +22,9 @@ POST /demo/add
     "posts": 32768
 }
 
-# /demo/save
+# /demo-user/save
 --
-POST /demo/save 
+POST /demo-user/save 
 
 {
     "id": "bpsshl3ipt306cb9n3f0",
@@ -36,9 +36,9 @@ POST /demo/save
     "posts": 65536
 }
 
-# /demo/list 
+# /demo-user/list 
 -- 
-POST /demo/list 
+POST /demo-user/list 
 
 {
     "page_number": 1,
@@ -48,7 +48,7 @@ POST /demo/list
     "is_approved": true
 }
 
-# /demo/info 
+# /demo-user/info 
 --
-GET /demo/info/bpsshl3ipt306cb9n3f0
+GET /demo-user/info/bpsshl3ipt306cb9n3f0
 

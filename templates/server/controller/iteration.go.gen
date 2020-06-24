@@ -33,7 +33,7 @@ func New{{$Ctrl}}({{$svc}} {{.Setting.Service}}.{{$ISvc}}) *{{$Ctrl}} {
 
 // server module register interface
 func (c *{{$Ctrl}}) RegisterModule(s *server.Server) {
-	g := s.Group("/{{.Model.Name|lower}}")
+	g := s.Group("/{{.Model.Name|kebabCase}}")
 	g.POST("/add", c.Add)
 	g.POST("/save", c.Save)
 	g.POST("/list", c.List)
