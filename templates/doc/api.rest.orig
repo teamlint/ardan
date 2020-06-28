@@ -1,0 +1,32 @@
+# A REST console for Vim
+# https://github.com/diepm/vim-rest-console
+# Hit the trigger key (<C-j> by default).
+
+# global scope.
+http://localhost:1234
+Content-Type: "application/json"
+--
+# end global scope.
+
+# /
+--
+GET /
+
+# /_health
+--
+GET / _health
+
+# /auth
+-- 
+POST /auth
+{
+    "username": "admin",
+    "password": "ardan"
+}
+
+# /private
+--
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTM5NDAzMjIsImlkIjoiYWRtaW4ifQ.j-xWHbyAX7zfGDBg2SQI9QAEOZPN7SPvoUdmWr-4vrQ
+GET /private/
+
+

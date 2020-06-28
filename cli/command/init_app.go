@@ -4,12 +4,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// InitApp init application layer layout
+// InitApp init application layer infrastructure codes
 var InitApp = &cli.Command{
-	Name:    "app",
-	Aliases: []string{"a"},
-	Usage:   "initial application layer layout",
-	Action:  initAppCode,
+	Name:   "app",
+	Usage:  "initial application layer infrastructure codes",
+	Action: initAppCode,
 }
 
 func initAppCode(c *cli.Context) error {

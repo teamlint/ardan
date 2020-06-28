@@ -13,27 +13,15 @@ var Gen = &cli.Command{
 	Aliases: []string{"gen", "g"},
 	Usage:   "generate source codes",
 	Action: func(c *cli.Context) error {
-		var err error
-		err = genAll(c)
-		if err != nil {
-			return err
-		}
-		return nil
+		return cli.ShowSubcommandHelp(c)
 	},
 	Subcommands: []*cli.Command{
+		GenAll,
 		GenQuery,
 		GenRepository,
 		GenService,
 		GenController,
 	},
-}
-
-func genAll(c *cli.Context) error {
-	if err := genModelFile(c, setting.GenTypeAll); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func genModelFile(c *cli.Context, genType setting.GenType) error {

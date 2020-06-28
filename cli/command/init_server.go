@@ -4,11 +4,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// InitServer init server layer layout
+// InitServer init server layer infrastructure codes
 var InitServer = &cli.Command{
 	Name:    "server",
 	Aliases: []string{"s"},
-	Usage:   "initial server layer layout",
+	Usage:   "initial server layer infrastructure codes",
 	Action:  initServerCode,
 }
 

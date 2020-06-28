@@ -32,7 +32,7 @@ go install # OR: task install
 mkdir myproject
 cd myproject
 go mod init <name>
-ardan -s -dc <db-conn> init  
+ardan -s -dc <db-conn> init all
 ```
 #### Project layout
 
@@ -88,9 +88,8 @@ genrate model query/repository/service/controller codes.
 `ardan gen [query|repository|service|controller]`
 
 ```shell
-ardan gen 
+ardan gen all
 ```
 
 ## TODO
-- 非子命令不执行
-
+-

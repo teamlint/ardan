@@ -4,10 +4,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// InitDoc init document directory
+// InitDoc init document infrastructure codes
 var InitDoc = &cli.Command{
 	Name:   "doc",
-	Usage:  "initial document directory",
+	Usage:  "initial document infrastructure codes",
 	Action: initDocCode,
 }
 

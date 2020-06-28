@@ -4,10 +4,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// InitCmd init command layer layout
+// InitCmd init command layer infrastructure codes
 var InitCmd = &cli.Command{
 	Name:   "cmd",
-	Usage:  "initial executed command layer layout",
+	Usage:  "initial executed command layer infrastructure codes",
 	Action: initCmdCode,
 }
 
