@@ -28,6 +28,11 @@ go install # OR: task install
 ### Usages
 
 #### Init Project
+
+initial application project layout & infrastructure codes
+
+`ardan [global options] init [all|query|repository|service|controller]`
+
 ```go
 mkdir myproject
 cd myproject
@@ -85,7 +90,7 @@ have fun!.
 
 genrate model query/repository/service/controller codes.
 
-`ardan gen [query|repository|service|controller]`
+`ardan gen [all|query|repository|service|controller]`
 
 ```shell
 ardan gen all
