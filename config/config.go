@@ -17,25 +17,36 @@ var (
 )
 
 const (
-	ConfigFile                = "./config.yml"
-	DefaultTitle              = "teamlint"
-	DefaultCopyright          = "teamlint.com"
-	DefaultTimeFormat         = "2006-01-02 15:04:05"
-	DefaultCharset            = "UTF-8"
+	ConfigFile = "./config.yml"
+	// App
+	DefaultTitle      = "teamlint"
+	DefaultCopyright  = "teamlint.com"
+	DefaultTimeFormat = "2006-01-02 15:04:05"
+	DefaultCharset    = "UTF-8"
+	// Server
 	DefaultServerHTTPAddr     = ":1234"
 	DefaultServerReadTimeout  = "5s"
 	DefaultServerWriteTimeout = "10s"
 	DefaultServerIdleTimeout  = "15s"
+	// Databases
+	DefaultDatabaseDriverName      = "postgres"
+	DefaultDatabaseConnString      = "postgres://postgres:postgres@localhost/ardan?sslmode=disable"
+	DefaultDatabaseConnMaxLifetime = "3m"
+	DefaultDatabaseMaxOpenConns    = 300
+	DefaultDatabaseMaxIdleConns    = 10
+	DefaultDatabaseLog             = false
+	// Caches
 )
 
 type Option func(conf *section.Config)
 
 func init() {
 	conf = &section.Config{
-		App:    &section.App{},
-		Server: &section.Server{},
+		App:       &section.App{},
+		Server:    &section.Server{},
+		Databases: section.Databases{},
+		Caches:    section.Caches{},
 	}
-	defaultOption(conf)
 	sources := []source.Source{env.NewSource()}
 	if pkg.Exists(ConfigFile) {
 		sources = append(sources, file.NewSource(file.WithPath(ConfigFile)))
@@ -60,8 +71,9 @@ func Load(source ...source.Source) error {
 func Config(opts ...Option) *section.Config {
 	err := config.Get().Scan(conf)
 	if err != nil {
-		log.Fatalf("config file read err: %v\n", err)
+		log.Fatalf("config read err: %v\n", err)
 	}
+	defaultOption(conf)
 	for _, opt := range opts {
 		opt(conf)
 	}
@@ -109,7 +121,7 @@ func Get(path ...string) reader.Value {
 // defaultOption 默认值
 func defaultOption(conf *section.Config) {
 	// App
-	conf.App.Debug = true
+	// conf.App.Debug = true
 	if conf.App.Title == "" {
 		conf.App.Title = DefaultTitle
 	}
@@ -134,6 +146,18 @@ func defaultOption(conf *section.Config) {
 	}
 	if conf.Server.IdleTimeout == "" {
 		conf.Server.IdleTimeout = DefaultServerIdleTimeout
+	}
+	// Databases
+	if len(conf.Databases) == 0 {
+		database := section.Database{
+			DriverName:      DefaultDatabaseDriverName,
+			ConnString:      DefaultDatabaseConnString,
+			ConnMaxLifetime: DefaultDatabaseConnMaxLifetime,
+			MaxOpenConns:    DefaultDatabaseMaxOpenConns,
+			MaxIdleConns:    DefaultDatabaseMaxIdleConns,
+			Log:             DefaultDatabaseLog,
+		}
+		conf.Databases["Ardan"] = &database
 	}
 }
 
