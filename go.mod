@@ -15,7 +15,7 @@ require (
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/huandu/xstrings v1.3.0 // indirect
 	github.com/mattn/go-zglob v0.0.1 // indirect
-	github.com/micro/go-micro v1.18.0
+	github.com/micro/go-micro/v2 v2.9.0
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/radovskyb/watcher v1.0.7 // indirect
 	github.com/rakyll/statik v0.1.7

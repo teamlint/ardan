@@ -3,11 +3,11 @@ package config
 import (
 	"log"
 
-	"github.com/micro/go-micro/config"
-	"github.com/micro/go-micro/config/reader"
-	"github.com/micro/go-micro/config/source"
-	"github.com/micro/go-micro/config/source/env"
-	"github.com/micro/go-micro/config/source/file"
+	"github.com/micro/go-micro/v2/config"
+	"github.com/micro/go-micro/v2/config/reader"
+	"github.com/micro/go-micro/v2/config/source"
+	"github.com/micro/go-micro/v2/config/source/env"
+	"github.com/micro/go-micro/v2/config/source/file"
 	"github.com/teamlint/ardan/config/section"
 	"github.com/teamlint/ardan/pkg"
 )
@@ -47,7 +47,7 @@ func init() {
 		Databases: section.Databases{},
 		Caches:    section.Caches{},
 	}
-	sources := []source.Source{env.NewSource()}
+	sources := []source.Source{env.NewSource(env.WithPrefix("ARDAN"), env.WithStrippedPrefix("ARDAN"))}
 	if pkg.Exists(ConfigFile) {
 		sources = append(sources, file.NewSource(file.WithPath(ConfigFile)))
 	}
