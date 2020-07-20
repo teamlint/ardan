@@ -64,12 +64,10 @@ func genFile(c *cli.Context, name string, model *Model, genType setting.GenType)
 			return nil
 		}
 	case setting.GenTypeService: // service
-
 		if !Setting.IsService(name) {
 			return nil
 		}
 	case setting.GenTypeController: // controller
-
 		if !Setting.IsController(name) {
 			return nil
 		}

@@ -36,7 +36,7 @@ tasks:
     desc: "ardan gen"
     cmds:
       - echo "ardan.gen query|repository|service|controller"
-      - ardan gen
+      - ardan gen all
     silent: true
  
   release:
