@@ -40,6 +40,21 @@ tasks:
         sh: git describe --always --tags --dirty
     silent: true
 
+  github:
+    desc: "github release"
+    deps: [res]
+    cmds:
+      - echo "github release generating..."
+      - GOOS=darwin GOARCH=amd64 go build -ldflags "-w -s -X github.com/teamlint/ardan/version.Version={{.GitCommit}}" -o ./release/{{.Product}}_{{.GitCommit}}_mac ./main.go
+      - GOOS=linux GOARCH=amd64 go build -ldflags "-w -s -X github.com/teamlint/ardan/version.Version={{.GitCommit}}" -o ./release/{{.Product}}_{{.GitCommit}}_linux ./main.go
+      - GOOS=windows GOARCH=amd64 go build -ldflags "-w -s -X github.com/teamlint/ardan/version.Version={{.GitCommit}}" -o ./release/{{.Product}}_{{.GitCommit}}_windows.exe ./main.go
+      - echo "github release {{.Product}}_{{.GitCommit}}."
+    vars:
+      GitCommit:
+        sh: git describe --always --tags 
+    silent: true
+
+
   version:
     desc: "version"
     cmds:
@@ -59,3 +74,10 @@ tasks:
         sh: git describe --always --tags --dirty
     silent: true
 
+  clean:
+    desc: "clean release files"
+    cmds:
+      - echo "cleaning..."
+      - rm -rf ./release
+      - echo "clean done."
+    silent: true
