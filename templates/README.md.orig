@@ -27,5 +27,5 @@ ardan sync
 
 ### 生成资源库/应用服务/控制器
 ```golang
-ardan gen
+ardan gen all
 ```
