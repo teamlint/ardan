@@ -362,22 +362,22 @@ func (s *Setting) IsIteration(path string) bool {
 }
 
 func (s *Setting) IsQuery(path string) bool {
-	layout := filepath.Join(s.App, s.Model, s.Query)
+	layout := s.SlashPath(filepath.Join(s.App, s.Model, s.Query))
 	return strings.HasPrefix(clean(path), layout)
 }
 
 func (s *Setting) IsRepository(path string) bool {
-	layout := filepath.Join(s.App, s.Repository)
+	layout := s.SlashPath(filepath.Join(s.App, s.Repository))
 	return strings.HasPrefix(clean(path), layout)
 }
 
 func (s *Setting) IsService(path string) bool {
-	layout := filepath.Join(s.App, s.Service)
+	layout := s.SlashPath(filepath.Join(s.App, s.Service))
 	return strings.HasPrefix(clean(path), layout)
 }
 
 func (s *Setting) IsController(path string) bool {
-	layout := filepath.Join(s.Server, s.Controller)
+	layout := s.SlashPath(filepath.Join(s.Server, s.Controller))
 	return strings.HasPrefix(clean(path), layout)
 }
 
@@ -407,4 +407,8 @@ func (s *Setting) ParseDirectiveGen(doc string) (*GenSet, error) {
 		Controller:       controller,
 	}, nil
 
+}
+
+func (s *Setting) SlashPath(path string) string {
+	return filepath.ToSlash(path)
 }
