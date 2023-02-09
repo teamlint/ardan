@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
 	github.com/alexellis/go-execute v0.0.0-20200124154445-8697e4e28c5e
 	github.com/fatih/structtag v1.2.0 // indirect
-	github.com/gin-gonic/gin v1.7.0
+	github.com/gin-gonic/gin v1.7.7
 	github.com/go-task/task v2.2.0+incompatible
 	github.com/huandu/xstrings v1.3.0 // indirect
 	github.com/mattn/go-zglob v0.0.1 // indirect
