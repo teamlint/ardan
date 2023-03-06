@@ -3,7 +3,7 @@ module github.com/teamlint/ardan
 go 1.14
 
 require (
-	github.com/Masterminds/goutils v1.1.0 // indirect
+	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
 	github.com/alexellis/go-execute v0.0.0-20200124154445-8697e4e28c5e
